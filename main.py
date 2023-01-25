@@ -31,7 +31,7 @@ for j in range(n):
     os.mkdir('./avl/configs/%s/geracao-%d' % (code, j+1))
     avl.caminho_geometrias = './avl/configs/%s/geracao-%d/' % (code,j + 1)
     #candidatos = optimizer.reproducao(candidatos, 0.01)
-    candidatos = optimizer.reproducao2(candidatos, 0.01)
+    candidatos = optimizer.reproducao2(candidatos, optimizer.n_filhos, 0.01)
 
     print("Avaliação total |G", j+1, "| : ")
     print(optimizer.mediaAvaliacao(candidatos))

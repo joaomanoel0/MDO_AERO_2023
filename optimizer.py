@@ -6,7 +6,7 @@ from operator import attrgetter
 
 n_candidatos = 150
 n_selecionados = 50
-n_filhos = 100
+n_filhos = 150
 
 b_min_w = 1.5
 c_min_w = 0.2
@@ -248,10 +248,13 @@ def selecaoRoleta(pais):
 
     return pai, mae
 
-def reproducao2(populacao, sigma, mutacao = 0.4):
+def reproducao2(populacao, n_filhos, sigma, mutacao = 0.4):
+    candidatos = sorted(populacao, key = lambda a : a.nota, reverse = True)[:int(n_filhos/2)]
     filhos = []
-    while len(filhos) < n_filhos:
+    for individuo in candidatos:
         pai, mae = selecaoRoleta(populacao)
         filho = gerarFilho(pai, mae, sigma, mutacao)
         filhos.append(filho)
+        filhos.append(variar(individuo, sigma))
     return filhos
+

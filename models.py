@@ -2,6 +2,8 @@ from tools import avaliar_geometria, cla, a0l, constantes_perfil
 import random
 from avl import resultados_avl
 import math
+from matplotlib import pyplot as plt
+import numpy as np
 
 n = 1
 rho = 1.16
@@ -17,7 +19,7 @@ class Monoplano:
     geometria_eh = []
     geometria_ev = []
     posicoes = {} # Referência: centro do bordo de ataque da asa
-    
+
     def __init__(self, asa, perfil_asa, iw, eh, perfil_eh, ih, ev, perfil_ev, posicoes, mtow):
         self.geometria_asa = asa.copy()
         self.geometria_eh = eh.copy()
@@ -58,7 +60,7 @@ class Monoplano:
         else:
             self.atrim = -self.CM0/self.CMa
             self.CLtrim = (self.CLa*self.atrim + self.CL0)
-            self.CL_CD = self.CLtrim/self.polar_arrasto(self.CLtrim, 1)
+            self.CL_CD = self.CLtrim/self.resgnd['CD']#polar_arrasto(self.CLtrim, 1)
         self.ME = (self.Xnp - self.xcg)/self.cw
         
         self.CLmax = self.resgnd['CL'] + (astall - self.iw)*self.resgnd['CLa']
@@ -66,7 +68,7 @@ class Monoplano:
 
         vd = 1.2*self.vestol
         L = 0.5*rho*self.Sw*self.resgnd['CL']*(0.7*vd)**2
-        D = 0.5*rho*self.Sw*self.polar_arrasto(self.resgnd['CL'], self.phi)* (0.7*vd)**2
+        D = 0.5*rho*self.Sw*(0.7*vd)**2 #self.polar_arrasto(self.resgnd['CL'], self.phi)*"""
         T = tracao(0.7*vd)
         W = self.mtow*g
         self.x_decolagem = 1.44*(W**2)/(g*rho*self.Sw*self.CLmax*(T - D - mu*(W - L)))
@@ -74,7 +76,7 @@ class Monoplano:
 
         vp = 1.3*self.vestol
         L = 0.5*rho*self.Sw*self.resgnd['CL']*(0.7*vp)**2
-        D = 0.5*rho*self.Sw*self.polar_arrasto(self.resgnd['CL'], self.phi)* (0.7*vp)**2
+        D = 0.5*rho*self.Sw*(0.7*vp)**2 #self.polar_arrasto(self.resgnd['CL'], self.phi)
         self.x_pouso = 1.69*(W**2)/(g*rho*self.Sw*self.CLmax*(D + mu*(W - L)))
         #self.x_pouso = self.pouso()
 
@@ -89,8 +91,22 @@ class Monoplano:
         self.VH = (self.lh*self.Sh)/(self.cw*self.Sw)
         self.VV = (self.Sv*self.lv)*2/(self.Sw*self.bw)
 
-    def polar_arrasto(self, CL, phi):
-        return self.CD0 + phi*self.K*(CL**2)
+    def polar_arrasto(self):
+        cd0 = 0
+        cd_max = self.resgnd['CD']
+        cd_range = np.linspace(cd0, cd_max, 100)
+        cl_values = ((cd_range-cd0)/self.K*self.phi)**(1/2)
+
+        #Definição do cl máximo
+        cl_max = np.max(cl_values)
+        print('O maior Cl possível da polar de arrasto é:', cl_max)
+
+        #Plotagem (não roda essa parte na main.py)
+        plt.plot(cd_range, cl_values)
+        plt.xlabel('Coeficiente de arrasto (Cd)')
+        plt.ylabel('Coeficiente de sustentação (Cl)')
+        #mostrar_polar = plt.show()
+        
 
     def estimar_cg(self):
         massaHELICE2021 = 0.11174  # ajustar #
@@ -308,7 +324,7 @@ class Monoplano:
             t += dt
         return x
 
-    def avaliar(self): # dificuldade na forma de avaliação 
+    def avaliar(self):
         res = 0
         # Requesitos de estabilidade estática e dinâmica (sadraey tabela 6.3)
         CLcruzeiro = (2*g*self.mtow)/(rho*(v_cruzeiro**2)*self.Sw)
@@ -345,7 +361,7 @@ def func_erro(valor, bot, top):
     weight = 4/((bot-top)**2)
     return -weight*(valor - bot)*(valor - top)
 
-def func_erro_neg(valor, top, w): 
+def func_erro_neg(valor, top, w):
     if valor < top:
         return 1
     else:

@@ -94,10 +94,10 @@ class desempenho:
     #def envelope_de_voo():
 
     def mtow(self):
-        rho = 1
-        Carga_util = []  #[[Sg1_F,W1_F],[Sg2_F],[Sg3_F,W3_F],...[Sgi_F,Wi_F],[Sg1_S,W1_S]...[Sgi_S,Wi_S],[Sg1_I,W1_I],...[Sgi_I,Wi_I]]
+        rho = 1 # parâmetro de densidade que auxiliará a percorrer a lista
+        Carga_util = [] # lista vazia para receber os valores de Sg, W e rho
         while rho <= 3:
-            mtow = 12.0 # MTOW inicial
+            mtow = 12.0 # Mtow inicial
             if rho == 1: rho = 1.225 # Troca o valor de rho = 1 para rho = 1.225 kg/m³
             elif rho == 2: rho = 1.156 # Troca o valor de rho = 2 para rho = 1.156 kg/m³
             else: rho = 1.090 # Troca o valor de rho = 3 para rho = 1.090 kg/m³
@@ -137,11 +137,8 @@ class desempenho:
             else:
                 break
         if self.rho == 1.225:
-            print(f'\nO mtow máximo encontrado é: {mtowF} kg') # Verifica o mtow usado para rho = 1.225kg/m³
             return mtowF
         elif self.rho == 1.156:
-            print(f'\nO mtow máximo encontrado é: {mtowS} kg') # Verifica o mtow usado para rho = 1.156kg/m³
             return mtowS
         elif self.rho == 1.090:
-            print(f'\nO mtow máximo encontrado é: {mtowI} kg') # Verifica o mtow usado para rho = 1.090kg/m³
             return mtowI

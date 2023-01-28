@@ -4,8 +4,6 @@ from math import *
 from classe_desempenho import desempenho
 import os
 
-# Escolha do local de decolagem (Fortaleza, SP ou ITA) para a análise do MDO
-
 os.system("cls")
 
 print("\nDigite o local o qual você deseja fazer a avaliação de desempenho\n")
@@ -20,9 +18,8 @@ elif AD == 'I':
 
 os.system("cls")
 
-# Parâmetros (inputs) das funções de desempenho
-
-det1 = desempenho(9.80665, 0.09, 0.08177549781, 2.210, 0.011, 0.14, 2.00, 0.99, rho, '16x8')
+# Instâncias (inputs) das funções de desempenho
+det1 = desempenho(9.80665, 0.09, 0.08177549781, 2.210, 0.011, 0.14, 2.00, 0.99, rho, '14x7')
 
 '''
 1º. gravidade em m/s² (g)
@@ -37,7 +34,9 @@ det1 = desempenho(9.80665, 0.09, 0.08177549781, 2.210, 0.011, 0.14, 2.00, 0.99, 
 10º. tipo de hélice (prop)
 '''
 
-print(f"\nA velocidade de estol é {det1.vel_estol():.4} m/s\n")
+# Mtow e Estol
+print(f"O mtow máximo encontrado é {det1.mtow():.4} kg\n")
+print(f"A velocidade de estol é {det1.vel_estol():.4} m/s\n")
 
 # Decolagem
 print(f"A velocidade de decolagem é {det1.vel_liftoff():.5} m/s")
@@ -61,7 +60,3 @@ print(f"A distância de pouso (FAR-23) é de {det1.pouso()[0]:.6} m")
 print(f"A distância de pouso real é de {det1.pouso()[1]:.6} m")
 print(f"O ângulo de planeio ideal para pouso é {det1.pouso()[2]:.4}°")
 print(f"A velocidade de planeio para o ângulo ideal é {det1.pouso()[3]:.5} m/s\n")
-
-# Teto de voo
-
-# Carga útil em função da altitude-densidade

@@ -21,7 +21,7 @@ def criar_arquivo(aeronave, efeito_solo):
         arq.write('0 0 0.0\n') # IYsym   IZsym   Zsym
         arq.write('%.2f %.2f %.2f\n' % (aeronave.Sw, aeronave.cw, aeronave.bw)) # Sref    Cref    Bref
         arq.write('%.2f 0.0 0.0\n' % aeronave.xcg) # Xref    Yref    Zref
-    #arq.write("#M %.2f" % aeronave.mtow)
+    arq.write("#M %.2f" % aeronave.mtow)
     arq.write("\nSURFACE\n")
     arq.write("Asa\n")
     arq.write("8 1.0 12 1.0\n") # Discretização

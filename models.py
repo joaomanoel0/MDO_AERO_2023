@@ -2,6 +2,7 @@ from tools import avaliar_geometria, cla, a0l, constantes_perfil
 import random
 from avl import resultados_avl
 import math
+from classe_desempenho import desempenho
 
 n = 1
 rho = 1.16
@@ -79,7 +80,10 @@ class Monoplano:
         #self.x_pouso = self.pouso()
 
         self.avaliar()
-    
+        self.pv = 4.0 # definindo valor do peso vazio 
+        self.cp = mtow - self.pv
+        self.calcula_nota_competicao()
+
     def atualizar_geometria(self):
         self.Sw, self.bw, self.cw, self.ARw, self.Xacw = avaliar_geometria(self.geometria_asa)
         self.Sh, self.bh, self.ch, self.ARh, self.Xach = avaliar_geometria(self.geometria_eh)
@@ -340,6 +344,9 @@ class Monoplano:
         res += 50*func_erro(self.ARh, 3, 5)
         res += 1200*(self.carga_paga)**2
         self.nota = res
+    
+    def calcula_nota_competicao(self):
+        self.nota_avaliacao = 15*(self.cp/self.pv)+self.cp
 
 def func_erro(valor, bot, top):
     weight = 4/((bot-top)**2)
@@ -353,3 +360,4 @@ def func_erro_neg(valor, top, w):
 
 def tracao(v):
     return 46.439 - 0.935*v - 0.0144*v*v
+    

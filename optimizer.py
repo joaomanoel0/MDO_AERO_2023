@@ -2,6 +2,7 @@ import random
 from models import Monoplano
 from avl import criar_arquivo
 from operator import attrgetter
+from classe_desempenho import desempenho
 # from random import *
 
 n_candidatos = 150
@@ -221,15 +222,14 @@ def trunc_gauss(mu, sigma, bottom, top):
         return bottom
     return a
 
-
 def mediaAvaliacao(aeronaves):
     media = 0
     for aeronave in aeronaves:
-        media += aeronave.nota
+        media += aeronave.nota_avaliacao
     return (media/(len(aeronaves)))
 
 def sortear(pais, indice_a_ignorar = -1):
-    sigma = len(pais)/32
+    sigma = len(pais)/20
     continua = True
     while continua:
         indice_sorteado = int(random.gauss(0, sigma))
@@ -253,8 +253,7 @@ def reproducao2(populacao, n_filhos, sigma, mutacao = 0.4):
     filhos = []
     for individuo in candidatos:
         pai, mae = selecaoRoleta(populacao)
-        filho = gerarFilho(pai, mae, sigma, mutacao)
-        filhos.append(filho)
+        filhos.append(gerarFilho(pai, mae, sigma, mutacao))
         filhos.append(variar(individuo, sigma))
     return filhos
 

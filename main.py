@@ -24,17 +24,16 @@ candidatos = sorted(inicial, key = lambda a : a.nota, reverse = True)[:optimizer
 #print("avaliação total 1: ")
 #print(optimizer.avaliacaoTotal(inicial))
 ant = 0
-n = 200
+n = 80
 nota_ant = -1000
 notas = []
 for j in range(n):
     os.mkdir('./avl/configs/%s/geracao-%d' % (code, j+1))
     avl.caminho_geometrias = './avl/configs/%s/geracao-%d/' % (code,j + 1)
-    #candidatos = optimizer.reproducao(candidatos, 0.01)
     candidatos = optimizer.reproducao2(candidatos, optimizer.n_filhos, 0.01)
 
-    print("Avaliação total |G", j+1, "| : ")
-    print(optimizer.mediaAvaliacao(candidatos))
+    # print("Avaliação total |G", j+1, "| : ")
+    # print(optimizer.mediaAvaliacao(candidatos))
 
 #    print("Teste |G", j, "| : ")
 #    [pai, mae] = optimizer.selecaoRoleta(candidatos)
@@ -42,8 +41,9 @@ for j in range(n):
 #    print("Pai selecionado: ", mae.nota)
 
     melhor = max(candidatos, key= lambda a : a.nota)
-    print(optimizer.perfis_asa[0], optimizer.perfis_eh[0], "geração %d: %.3f" % (j+1, melhor.nota))
+    print(optimizer.perfis_asa[0], optimizer.perfis_eh[0], "geração %d: %.3f" % (j+1, melhor.nota), " | Nota na competição: ", melhor.nota_avaliacao)
     print("xcp = %.3f CLmax = %.4f atrim = %.3f Sw = %.3f ME = %.2f%% CP = %.2f pouso = %.2f decolagem = %.2f cma = %.2f arw = %.3f arh = %.3f" % (melhor.posicoes['cp'][0], melhor.CLmax, melhor.atrim, melhor.Sw, melhor.ME*100, melhor.carga_paga, melhor.x_pouso, melhor.x_decolagem, melhor.CMa *180/3.1416, melhor.ARw, melhor.ARh))
+    print("Média da geração: ", optimizer.mediaAvaliacao(candidatos))
     notas.append(melhor.nota)
     arq_melhor = open('./avl/configs/%s/geracao-%d-melhor.pyobj' % (code, j + 1), 'wb')
     pickle.dump(melhor, arq_melhor)

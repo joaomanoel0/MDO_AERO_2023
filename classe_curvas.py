@@ -1,4 +1,4 @@
-# Classe das curvas de tração, potência e R/C do MDO 2023
+# Classe das curvas de tração, potência e RoC do MDO 2023
 
 import numpy as np
 
@@ -96,126 +96,17 @@ class curvas:
                 return pI_16x8(V) # Retorna a Tração disponível para a velocidade 'V' passada como parâmetro, para rho = 1.090kg/m³
 
     def tracao_requerida(self, V):
-        if self.rho == 1.225:
-            Cl = (2*self.W)/(self.rho*V**2*self.Sw)
-            Cd = self.Cdmin + self.K*Cl**2
-            Tr = self.W/(Cl/Cd)
-            return Tr
-        elif self.rho == 1.156:
-            Cl = (2*self.W)/(self.rho*V**2*self.Sw)
-            Cd = self.Cdmin + self.K*Cl**2
-            TrS = self.W/(Cl/Cd)
-            return TrS
-        elif self.rho == 1.090:
-            Cl = (2*self.W)/(self.rho*V**2*self.Sw)
-            Cd = self.Cdmin + self.K*Cl**2
-            TrI = self.W/(Cl/Cd)
-            return TrI
+        Cl = (2*self.W)/(self.rho*V**2*self.Sw)
+        Cd = self.Cdmin + self.K*Cl**2
+        return self.W/(Cl/Cd)
 
     def potencia_requerida(self, V):
-        if self.rho == 1.225:
-            Pr = curvas.tracao_requerida(self, V)*V
-            return Pr
-        elif self.rho == 1.156:
-            PrS = curvas.tracao_requerida(self, V)*V
-            return PrS
-        elif self.rho == 1.090:
-            PrI = curvas.tracao_requerida(self, V)*V
-            return PrI
+        return curvas.tracao_requerida(self, V)*V
 
     def potencia(self, V):
-        if self.prop == '14x7':
-            if self.rho == 1.225:
-                Pd = curvas.tracao(self, V)*V
-                return Pd
-            elif self.rho == 1.156:
-                PdS = curvas.tracao(self, V)*V
-                return PdS
-            elif self.rho == 1.090:
-                PdI = curvas.tracao(self, V)*V
-                return PdI
-        if self.prop == '15x7':
-            if self.rho == 1.225:
-                Pd = curvas.tracao(self, V)*V
-                return Pd
-            elif self.rho == 1.156:
-                PdS = curvas.tracao(self, V)*V
-                return PdS
-            elif self.rho == 1.090:
-                PdI = curvas.tracao(self, V)*V
-                return PdI
-        if self.prop == '15x10':
-            if self.rho == 1.225:
-                Pd = curvas.tracao(self, V)*V
-                return Pd
-            elif self.rho == 1.156:
-                PdS = curvas.tracao(self, V)*V
-                return PdS
-            elif self.rho == 1.090:
-                PdI = curvas.tracao(self, V)*V
-                return PdI
-        if self.prop == '16x8':
-            if self.rho == 1.225:
-                Pd = curvas.tracao(self, V)*V
-                return Pd
-            elif self.rho == 1.156:
-                PdS = curvas.tracao(self, V)*V
-                return PdS
-            elif self.rho == 1.090:
-                PdI = curvas.tracao(self, V)*V
-                return PdI
-        
+        return curvas.tracao(self, V)*V
+    
     def razao_subida(self, V):
-        if self.prop == '14x7':
-            if self.rho == 1.225:
-                RC_14x7 = (curvas.potencia(self, V)-curvas.potencia_requerida(self, V))/self.W
-                if RC_14x7 < 0: return 0
-                else: 
-                    return RC_14x7
-            elif self.rho == 1.156:
-                RCS_14x7 = (curvas.potencia(self, V)-curvas.potencia_requerida(self, V))/self.W
-                if RCS_14x7 < 0: return 0
-                else: return RCS_14x7
-            elif self.rho == 1.090:
-                RCI_14x7 = (curvas.potencia(self, V)-curvas.potencia_requerida(self, V))/self.W
-                if RCI_14x7 < 0: return 0
-                else: return RCI_14x7
-        if self.prop == '15x7':
-            if self.rho == 1.225:
-                RC_15x7 = (curvas.potencia(self, V)-curvas.potencia_requerida(self, V))/self.W
-                if RC_15x7 < 0: return 0
-                else: return RC_15x7
-            elif self.rho == 1.156:
-                RCS_15x7 = (curvas.potencia(self, V)-curvas.potencia_requerida(self, V))/self.W
-                if RCS_15x7 < 0: return 0
-                else: return RCS_15x7
-            elif self.rho == 1.090:
-                RCI_15x7 = (curvas.potencia(self, V)-curvas.potencia_requerida(self, V))/self.W
-                if RCI_15x7 < 0: return 0
-                else: return RCI_15x7
-        if self.prop == '15x10':
-            if self.rho == 1.225:
-                RC_15x10 = (curvas.potencia(self, V)-curvas.potencia_requerida(self, V))/self.W
-                if RC_15x10 < 0: return 0
-                else: return RC_15x10
-            elif self.rho == 1.156:
-                RCS_15x10 = (curvas.potencia(self, V)-curvas.potencia_requerida(self, V))/self.W
-                if RCS_15x10 < 0: return 0
-                else: return RCS_15x10
-            elif self.rho == 1.090:
-                RCI_15x10 = (curvas.potencia(self, V)-curvas.potencia_requerida(self, V))/self.W
-                if RCI_15x10 < 0: return 0
-                else: return RCI_15x10
-        if self.prop == '16x8':
-            if self.rho == 1.225:
-                RC_16x8 = (curvas.potencia(self, V)-curvas.potencia_requerida(self, V))/self.W
-                if RC_16x8 < 0: return 0
-                else: return RC_16x8
-            elif self.rho == 1.156:
-                RCS_16x8 = (curvas.potencia(self, V)-curvas.potencia_requerida(self, V))/self.W
-                if RCS_16x8 < 0: return 0
-                else: return RCS_16x8
-            elif self.rho == 1.090:
-                RCI_16x8 = (curvas.potencia(self, V)-curvas.potencia_requerida(self, V))/self.W
-                if RCI_16x8 < 0: return 0
-                else: return RCI_16x8
+        RoC = (curvas.potencia(self, V)-curvas.potencia_requerida(self, V))/self.W
+        if RoC < 0: return 0
+        else: return RoC

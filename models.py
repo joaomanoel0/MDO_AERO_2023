@@ -7,7 +7,7 @@ import numpy as np
 from classe_desempenho import desempenho
 
 n = 1
-rho = 1.16
+rho = 1.225 # de acordo com a localidade (rho para Fortaleza)
 g = 9.81
 astall = 13
 mu = 0.09
@@ -21,15 +21,13 @@ class Monoplano:
     geometria_ev = []
     posicoes = {} # Referência: centro do bordo de ataque da asa
 
-    def __init__(self, asa, perfil_asa, iw, eh, perfil_eh, ih, ev, perfil_ev, posicoes, mtow):
+    def __init__(self, asa, perfil_asa, iw, eh, perfil_eh, ih, ev, perfil_ev, posicoes):
         self.geometria_asa = asa.copy()
         self.geometria_eh = eh.copy()
         self.geometria_ev = ev.copy()
         self.posicoes = posicoes.copy()
         self.atualizar_geometria()
-        self.mtow = mtow
-        self.xcg, self.carga_paga, self.peso_vazio = self.estimar_cg()
-        #self.xcg = 0.2*self.cw
+        self.xcg = 0.2*self.cw
         self.iw = iw
         self.ih = ih
         #self.atualizar_constantes()
@@ -65,25 +63,30 @@ class Monoplano:
         self.ME = (self.Xnp - self.xcg)/self.cw
         
         self.CLmax = self.resgnd['CL'] + (astall - self.iw)*self.resgnd['CLa']
+        aero = desempenho(g, mu, self.K, self.CLmax, self.CD0, self.hw, self.bw, self.Sw, rho, '14x7')
+        self.mtow = aero.Mtow
+        self.xcg, self.carga_paga, self.peso_vazio = self.estimar_cg()
         self.vestol = math.sqrt(2*self.mtow*g/(rho*self.Sw*self.CLmax))
 
         vd = 1.2*self.vestol
         L = 0.5*rho*self.Sw*self.resgnd['CL']*(0.7*vd)**2
+        #D = 0.5*rho*self.Sw*self.polar_arrasto(self.resgnd['CL'], self.phi)* (0.7*vd)**2
         D = 0.5*rho*self.Sw*(0.7*vd)**2 #self.polar_arrasto(self.resgnd['CL'], self.phi)*"""
         T = tracao(0.7*vd)
         W = self.mtow*g
-        self.x_decolagem = 1.44*(W**2)/(g*rho*self.Sw*self.CLmax*(T - D - mu*(W - L)))
-        #self.x_decolagem = self.decolagem()
+        #self.x_decolagem = 1.44*(W**2)/(g*rho*self.Sw*self.CLmax*(T - D - mu*(W - L)))
+        self.x_decolagem = aero.decolagem()[1]
 
         vp = 1.3*self.vestol
         L = 0.5*rho*self.Sw*self.resgnd['CL']*(0.7*vp)**2
+        #D = 0.5*rho*self.Sw*self.polar_arrasto(self.resgnd['CL'], self.phi)*(0.7*vp)**2
         D = 0.5*rho*self.Sw*(0.7*vp)**2 #self.polar_arrasto(self.resgnd['CL'], self.phi)
-        self.x_pouso = 1.69*(W**2)/(g*rho*self.Sw*self.CLmax*(D + mu*(W - L)))
-        #self.x_pouso = self.pouso()
+        #self.x_pouso = 1.69*(W**2)/(g*rho*self.Sw*self.CLmax*(D + mu*(W - L)))
+        self.x_pouso = aero.pouso()[1]
 
         self.avaliar()
         self.pv = 4.0 # definindo valor do peso vazio 
-        self.cp = mtow - self.pv
+        self.cp = self.mtow - self.pv
         self.calcula_nota_competicao()
 
     def atualizar_geometria(self):
@@ -94,6 +97,9 @@ class Monoplano:
         self.lv = self.posicoes["ev"][0] - 0.25*(self.cw - self.cv)
         self.VH = (self.lh*self.Sh)/(self.cw*self.Sw)
         self.VV = (self.Sv*self.lv)*2/(self.Sw*self.bw)
+
+    # def polar_arrasto(self, CL, phi):
+    #     return self.CD0 + phi*self.K*(CL**2)
 
     def polar_arrasto(self):
         cd0 = 0
@@ -363,6 +369,7 @@ class Monoplano:
     
     def calcula_nota_competicao(self):
         self.nota_avaliacao = 15*(self.cp/self.pv)+self.cp
+        #self.nota_avaliacao = self.cp*12.5
 
 def func_erro(valor, bot, top):
     weight = 4/((bot-top)**2)

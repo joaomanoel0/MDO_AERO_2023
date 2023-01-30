@@ -79,7 +79,7 @@ def gerar_inicial(total):
         lt = random.uniform(cr, soma_dims - ch - b*2)
         lt = soma_dims - ch - b*2
 
-        mtow = random.uniform(mtow_min, mtow_max)
+        #mtow = random.uniform(mtow_min, mtow_max)
 
         pos_cp = round(random.uniform(pos_cp_min, pos_cp_max)*cr, 2)
 
@@ -90,7 +90,7 @@ def gerar_inicial(total):
         # preenche o vetor de aeronaves com aeronaves
         perfil_ev = random.choice(perfis_ev)
         aeronaves.append(Monoplano(geometria_asa, perfil_asa, iw, geometria_eh,
-                         perfil_eh, ih, geometria_ev, perfil_ev, posicoes, mtow))
+                         perfil_eh, ih, geometria_ev, perfil_ev, posicoes))
     return aeronaves
 
 
@@ -133,7 +133,7 @@ def variar(aeronave, sigma):  # função para variar os paramestros de uma aeron
     lt = round(trunc_gauss(lt, sigma, cr, soma_dims - ch - b*2), 2)
     lt = soma_dims - ch - b*2
 
-    mtow = trunc_gauss(aeronave.mtow, sigma, 15, mtow_max)
+    #mtow = trunc_gauss(aeronave.mtow, sigma, 15, mtow_max)
 
     pos_cp = round(trunc_gauss(pos_cp, sigma, pos_cp_min*cr, pos_cp_max*cr), 2)
 
@@ -144,7 +144,7 @@ def variar(aeronave, sigma):  # função para variar os paramestros de uma aeron
     posicoes = {'asa': (0, 0), 'eh': (lt, ht),
                 'ev': (lt, ht), 'cp': (pos_cp, 0)}
 
-    return Monoplano(geometria_asa, aeronave.perfil_asa, iw, geometria_eh, aeronave.perfil_eh, ih, geometria_ev, aeronave.perfil_ev, posicoes, mtow)
+    return Monoplano(geometria_asa, aeronave.perfil_asa, iw, geometria_eh, aeronave.perfil_eh, ih, geometria_ev, aeronave.perfil_ev, posicoes)
 
 
 def gerarFilho(pai, mae, sigma, indiceMutacao):
@@ -188,7 +188,7 @@ def gerarFilho(pai, mae, sigma, indiceMutacao):
     #lt = round(trunc_gauss(lt, sigma, cr, soma_dims - ch - b*2), 2)
     lt = soma_dims - ch - b*2
 
-    mtow = pai.mtow
+    #mtow = pai.mtow
 
     pos_cp = pos_cpMae
 
@@ -198,7 +198,7 @@ def gerarFilho(pai, mae, sigma, indiceMutacao):
 
     posicoes = {'asa': (0, 0), 'eh': (lt, ht),
                 'ev': (lt, ht), 'cp': (pos_cp, 0)}
-    aeronave = Monoplano(geometria_asa, pai.perfil_asa, iw, geometria_eh, mae.perfil_eh, ih, geometria_ev, pai.perfil_ev, posicoes, mtow)
+    aeronave = Monoplano(geometria_asa, pai.perfil_asa, iw, geometria_eh, mae.perfil_eh, ih, geometria_ev, pai.perfil_ev, posicoes)
     if indiceMutacao > random.random():
         aeronave = variar(aeronave, sigma)
 

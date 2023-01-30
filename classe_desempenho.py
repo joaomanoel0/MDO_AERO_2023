@@ -50,7 +50,7 @@ class desempenho:
         return self.Cdmin + efeito_solo*self.K*(desempenho.Cl_ideal(self)**2)
 
     def ponto_projeto(self):
-        Cl_asterix = m.sqrt(self.Cdmin/self.K) # Coef. de sustentação que maximiza a eficiência aerodinâmica - ou o alcance, (Cl*)
+        Cl_asterix = m.sqrt(abs(self.Cdmin/self.K)) # Coef. de sustentação que maximiza a eficiência aerodinâmica - ou o alcance, (Cl*)
         #Cl_asterix =  m.sqrt((3*self.Cdmin)/self.K) # Coef. de sustentação que permite planeio com máxima autonomia (Cl*)
         #Cd_asterix = self.Cdmin + self.K*Cl_asterix**2 # Coef. de arrasto para o ponto de projeto [Equivale ao "(2*self.Cdmin)"]
         E_max = Cl_asterix/(2*self.Cdmin) # Eficiência aerodinâmica máxima também escrito como (L/D)max
@@ -104,9 +104,11 @@ class desempenho:
             while mtow <= 20:
                 W = mtow*self.g
                 T_Vlof_r2 = curvas.tracao(self, (1.2*(m.sqrt((2*W)/(rho*self.Sw*self.Clmax))))/m.sqrt(2)) # ad, 'Vlof/sqrt(2)' e Hélice
+                #print(T_Vlof_r2)
                 D_Vlof_r2 = 0.5*rho*(((1.2*(m.sqrt((2*W)/(rho*self.Sw*self.Clmax))))/m.sqrt(2))**2)*self.Sw*desempenho.Cd_ideal(self)
                 L_Vlof_r2 = 0.5*rho*(((1.2*(m.sqrt((2*W)/(rho*self.Sw*self.Clmax))))/m.sqrt(2))**2)*self.Sw*desempenho.Cl_ideal(self)
-                Sg = (1.44*W**2)/(self.g*rho*self.Sw*self.Clmax*(T_Vlof_r2-D_Vlof_r2-self.mu*(W-L_Vlof_r2)))
+                #print(W, self.g, rho, self.Sw, self.Clmax, T_Vlof_r2, D_Vlof_r2, self.mu, L_Vlof_r2)
+                Sg = (1.44*W**2)/(self.g*rho*self.Sw*self.Clmax*((T_Vlof_r2 - D_Vlof_r2) - self.mu*(W - L_Vlof_r2)))
                 if Sg <= 100:
                     Carga_util.append([Sg, W, rho])
                 else:
@@ -118,6 +120,7 @@ class desempenho:
             else: break
         x1, x2, x3 = [],[],[] # Valores de distância de decolagem para diferentes pesos na densidade do ar de 0m, 600m e 1200m
         y1, y2, y3 = [],[],[] # Valores de Pesos (W) diferentes para deolagem na densidade do ar de 0m, 600m e 1200m
+        mtowF, mtowS, mtowI = 1, 1, 1
         for i in Carga_util:
             if i[2] == 1.225:
                 x1.append(i[0]) # Valores de dist. de decolagem com rho = 1.225 kg/m³
@@ -137,8 +140,11 @@ class desempenho:
             else:
                 break
         if self.rho == 1.225:
+            #print(mtowF)
             return mtowF
         elif self.rho == 1.156:
+            #print("ok")
             return mtowS
         elif self.rho == 1.090:
+            #print("ok")
             return mtowI

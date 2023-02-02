@@ -38,14 +38,14 @@ mtow_max = 16
 
 offset_max = 0.4
 n_sect = 3
-dist_nariz = 0.295
+dist_nariz = 0.295 
 soma_dims = 3.2 - dist_nariz
 
 # perfis_asa = ['FX 74-Cl5-140 MOD (smoothed)', 'S1223 RTL', 'CH10 (smoothed)', 'DAE-21 AIRFOIL', 'WORTMANN FX 63-137 AIRFOIL', 'e423']
 # perfis_eh = ['e168', 'e169', 'e479', 'n0012', 'naca0015']
-perfis_asa = ['WORTMANN FX 63-137 AIRFOIL']
-perfis_eh = ['e168']
-perfis_ev = ['e169']
+perfis_asa = ['Asa_1', 'Asa_2', 'Asa_3', 'Asa_4']
+perfis_eh = ['EH_1', 'EH_2', 'EH_3']
+perfis_ev = ['EV_1', 'EV_2', 'EV_3']
 
 
 # gera aleatpriamente, entre os extremos máximos e minimos os valores dos parâmetros da aeronave
@@ -206,7 +206,7 @@ def gerarFilho(pai, mae, sigma, indiceMutacao):
 
 
 def reproducao(gerados, sigma):  # função de reprodução recebe aeronaves
-    pais = sorted(gerados, key=lambda a: a.nota, reverse=True)[:n_selecionados]
+    pais = sorted(gerados, key=lambda a: a.nota_avaliacao, reverse=True)[:n_selecionados]
     filhos = []
     for pai in pais:
         for i in range(int(len(gerados)/len(pais)) - 1):
@@ -240,7 +240,7 @@ def sortear(pais, indice_a_ignorar = -1):
     return indice_sorteado
 
 def selecaoRoleta(pais):
-    ordenados = sorted(pais,  key=attrgetter('nota'), reverse=True)
+    ordenados = sorted(pais,  key=attrgetter('nota_avaliacao'), reverse=True)
     indice_pai = sortear(ordenados)
     indice_mae = sortear(ordenados, indice_pai)
     pai = pais[indice_pai]
@@ -249,7 +249,7 @@ def selecaoRoleta(pais):
     return pai, mae
 
 def reproducao2(populacao, n_filhos, sigma, mutacao = 0.4):
-    candidatos = sorted(populacao, key = lambda a : a.nota, reverse = True)[:int(n_filhos/2)]
+    candidatos = sorted(populacao, key = lambda a : a.nota_avaliacao, reverse = True)[:int(n_filhos/2)]
     filhos = []
     for individuo in candidatos:
         pai, mae = selecaoRoleta(populacao)

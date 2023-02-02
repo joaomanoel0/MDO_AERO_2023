@@ -50,7 +50,7 @@ class desempenho:
         return self.Cdmin + efeito_solo*self.K*(desempenho.Cl_ideal(self)**2)
 
     def ponto_projeto(self):
-        Cl_asterix = m.sqrt(self.Cdmin/self.K) # Coef. de sustentação que maximiza a eficiência aerodinâmica - ou o alcance, (Cl*)
+        Cl_asterix = m.sqrt(abs(self.Cdmin/self.K)) # Coef. de sustentação que maximiza a eficiência aerodinâmica - ou o alcance, (Cl*)
         #Cl_asterix =  m.sqrt((3*self.Cdmin)/self.K) # Coef. de sustentação que permite planeio com máxima autonomia (Cl*)
         #Cd_asterix = self.Cdmin + self.K*Cl_asterix**2 # Coef. de arrasto para o ponto de projeto [Equivale ao "(2*self.Cdmin)"]
         E_max = Cl_asterix/(2*self.Cdmin) # Eficiência aerodinâmica máxima também escrito como (L/D)max

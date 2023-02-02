@@ -65,7 +65,7 @@ class Monoplano:
         self.CLmax = self.resgnd['CL'] + (astall - self.iw)*self.resgnd['CLa']
         aero = desempenho(g, mu, self.K, self.CLmax, self.CD0, self.hw, self.bw, self.Sw, rho, '14x7')
         self.mtow = aero.Mtow
-        self.xcg, self.carga_paga, self.peso_vazio = self.estimar_cg()
+        self.xcg, self.carga_paga, self.peso_vazio = self.estimar_cg() #dados desatualizados
         self.vestol = math.sqrt(2*self.mtow*g/(rho*self.Sw*self.CLmax))
 
         vd = 1.2*self.vestol
@@ -75,7 +75,7 @@ class Monoplano:
         T = tracao(0.7*vd)
         W = self.mtow*g
         #self.x_decolagem = 1.44*(W**2)/(g*rho*self.Sw*self.CLmax*(T - D - mu*(W - L)))
-        self.x_decolagem = aero.decolagem()[1]
+        self.x_decolagem = aero.decolagem()[1] #calculando a distância de pouso e decolagem apartir das funções de desempenho
 
         vp = 1.3*self.vestol
         L = 0.5*rho*self.Sw*self.resgnd['CL']*(0.7*vp)**2

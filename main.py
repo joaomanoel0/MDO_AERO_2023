@@ -24,7 +24,7 @@ candidatos = sorted(inicial, key = lambda a : a.nota, reverse = True)[:optimizer
 #print("avaliação total 1: ")
 #print(optimizer.avaliacaoTotal(inicial))
 ant = 0
-n = 80
+n = 10
 nota_ant = -1000
 notas = []
 for j in range(n):
@@ -32,27 +32,19 @@ for j in range(n):
     avl.caminho_geometrias = './avl/configs/%s/geracao-%d/' % (code,j + 1)
     candidatos = optimizer.reproducao2(candidatos, optimizer.n_filhos, 0.01)
 
-    # print("Avaliação total |G", j+1, "| : ")
-    # print(optimizer.mediaAvaliacao(candidatos))
-
-#    print("Teste |G", j, "| : ")
-#    [pai, mae] = optimizer.selecaoRoleta(candidatos)
-#    print("Pai selecionado: ", pai.nota)
-#    print("Pai selecionado: ", mae.nota)
-
-    melhor = max(candidatos, key= lambda a : a.nota)
+    melhor = max(candidatos, key= lambda a : a.nota_avaliacao)
     print(optimizer.perfis_asa[0], optimizer.perfis_eh[0], "geração %d: %.3f" % (j+1, melhor.nota), " | Nota na competição: ", melhor.nota_avaliacao)
-    print("xcp = %.3f CLmax = %.4f atrim = %.3f Sw = %.3f ME = %.2f%% CP = %.2f pouso = %.2f decolagem = %.2f cma = %.2f arw = %.3f arh = %.3f mtow = %.3f" % (melhor.posicoes['cp'][0], melhor.CLmax, melhor.atrim, melhor.Sw, melhor.ME*100, melhor.carga_paga, melhor.x_pouso, melhor.x_decolagem, melhor.CMa *180/3.1416, melhor.ARw, melhor.ARh, melhor.mtow))
+    print("xcp = %.3f CLmax = %.4f atrim = %.3f Sw = %.3f ME = %.2f%% CP = %.2f pouso = %.2f decolagem = %.2f cma = %.2f arw = %.3f arh = %.3f mtow = %.3f" % (melhor.posicoes['cp'][0], melhor.CLmax, melhor.atrim, melhor.Sw, melhor.ME*100, melhor.cp, melhor.x_pouso, melhor.x_decolagem, melhor.CMa *180/3.1416, melhor.ARw, melhor.ARh, melhor.mtow))
     print("Média da geração: ", optimizer.mediaAvaliacao(candidatos))
-    notas.append(melhor.nota)
+    notas.append(melhor.nota_avaliacao)
     arq_melhor = open('./avl/configs/%s/geracao-%d-melhor.pyobj' % (code, j + 1), 'wb')
     pickle.dump(melhor, arq_melhor)
     arq_melhor.close()
     shutil.rmtree('./avl/configs/%s/geracao-%d/' % (code, j + 1))
-    if abs(melhor.nota - sum(notas)/10) < 0.5 and len(notas) == 10:
-        break
-    if len(notas) == 10:
-        notas.pop(0)
+    # if abs(melhor.nota_avaliacao - sum(notas)/10) < 0.5 and len(notas) == 10:
+    #     break
+    # if len(notas) == 10:
+    #     notas.pop(0)
 
 candidatos.sort(key=lambda a : a.nota, reverse=True)
 os.mkdir('./avl/configs/%s/resultado' % code)

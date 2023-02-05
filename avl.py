@@ -13,15 +13,14 @@ def criar_arquivo(aeronave, efeito_solo):
         arq.write('0.0\n')          # Mach
         arq.write('0 1 %.2f\n' % -aeronave.hw) # IYsym   IZsym   Zsym
         arq.write('%.2f %.2f %.2f\n' % (aeronave.Sw, aeronave.cw, aeronave.bw)) # Sref    Cref    Bref
-        arq.write('%.2f 0.0 0.0\n' % aeronave.xcg) # Xref    Yref    Zref
+        arq.write('%.3f 0.0 0.0\n' % (aeronave.xcg)) # Xref    Yref    Zref
     else:
         arq = open(caminho_geometrias + aeronave.nome + '.avl', 'w')
         arq.write(aeronave.nome + '\n')
         arq.write('0.0\n')          # Mach
         arq.write('0 0 0.0\n') # IYsym   IZsym   Zsym
         arq.write('%.2f %.2f %.2f\n' % (aeronave.Sw, aeronave.cw, aeronave.bw)) # Sref    Cref    Bref
-        arq.write('%.2f 0.0 0.0\n' % aeronave.xcg) # Xref    Yref    Zref
-    #arq.write("#M %.2f" % aeronave.mtow)
+        arq.write('%.3f 0.0 0.0\n' % (aeronave.xcg)) # Xref    Yref    Zref
     arq.write("\nSURFACE\n")
     arq.write("Asa\n")
     arq.write("8 1.0 12 1.0\n") # Discretização
@@ -33,6 +32,72 @@ def criar_arquivo(aeronave, efeito_solo):
         arq.write("%.2f %.2f 0.0 %.2f 0.0\n" % (sect[2], sect[0], sect[1])) # Xle    Yle    Zle     Chord   Ainc
         arq.write("AFILE\navl/%s.dat\n" % aeronave.perfil_asa)
 
+    if aeronave.tipo_ev == 't':
+        arq.write("\nSURFACE\n")
+        arq.write("EH\n")
+        arq.write("4 1.0 6 1.0\n") # Discretização
+        arq.write("TRANSLATE\n")
+        arq.write("%.2f %.2f %.2f\n" % (aeronave.posicoes["eh"][0], 0, aeronave.posicoes["eh"][1]+aeronave.bv))
+        arq.write("YDUPLICATE\n0.0\n")
+        arq.write("ANGLE\n%.0f\n" % aeronave.ih)
+        arq.write("COMPONENT\n2\n")
+        for sect in aeronave.geometria_eh:
+            arq.write("SECTION\n")
+            arq.write("%.2f %.2f %.2f %.2f 0.0\n" % (sect[2], sect[0], 0, sect[1])) # Xle    Yle    Zle     Chord   Ainc
+            arq.write("AFILE\navl/%s.dat\n" % aeronave.perfil_eh)
+        
+        arq.write("\nSURFACE\n")
+        arq.write("EV\n")
+        arq.write("4 1.0 6 1.0\n") # Discretização
+        arq.write("TRANSLATE\n")
+        arq.write("%.2f %.2f %.2f\n" % (aeronave.posicoes["ev"][0], 0, aeronave.posicoes["ev"][1]))
+        arq.write("COMPONENT\n2\n")
+        for sect in aeronave.geometria_ev:
+            arq.write("SECTION\n")
+            arq.write("%.2f %.2f %.2f %.2f 0.0\n" % (sect[2], 0, sect[0], sect[1])) # Xle    Yle    Zle     Chord   Ainc
+            arq.write("AFILE\navl/%s.dat\n" % aeronave.perfil_ev)
+    else:
+        arq.write("\nSURFACE\n")
+        arq.write("EH\n")
+        arq.write("4 1.0 6 1.0\n") # Discretização
+        arq.write("TRANSLATE\n")
+        arq.write("%.2f %.2f %.2f\n" % (aeronave.posicoes["eh"][0], 0, aeronave.posicoes["eh"][1]))
+        if aeronave.tipo_ev == "u":
+            arq.write("YDUPLICATE\n0.0\n")
+            arq.write("COMPONENT\n2\n")
+            for sect in aeronave.geometria_ev:
+                arq.write("SECTION\n")
+                arq.write("%.2f %.2f %.2f %.2f 0.0\n" % (sect[2], aeronave.bh/2, sect[0], sect[1])) # Xle    Yle    Zle     Chord   Ainc
+                arq.write("AFILE\navl/%s.dat\n" % aeronave.perfil_ev)
+        elif aeronave.tipo_ev == "h":
+            arq.write("YDUPLICATE\n0.0\n")
+            arq.write("COMPONENT\n2\n")
+            arq.write("#inicio do primeiro laco\n")
+            for sect in aeronave.geometria_ev:
+                arq.write("SECTION\n")
+                arq.write("%.2f %.2f %.2f %.2f 0.0\n" % (sect[2], aeronave.bh/2, sect[0]/2, sect[1])) # Xle    Yle    Zle     Chord   Ainc
+                arq.write("AFILE\navl/%s.dat\n" % aeronave.perfil_ev)
+            arq.write("#fim do primeiro laco\n")
+            arq.write("\nSURFACE\n")
+            arq.write("EV^-1\n")
+            arq.write("4 1.0 6 1.0\n") # Discretização
+            arq.write("TRANSLATE\n")
+            arq.write("%.2f %.2f %.2f\n" % (aeronave.posicoes["eh"][0], 0, aeronave.posicoes["eh"][1]))
+            arq.write("YDUPLICATE\n0.0\n")
+            arq.write("COMPONENT\n2\n")
+            arq.write("#inicio do segundo laco\n")
+            for sect in aeronave.geometria_ev:
+                arq.write("SECTION\n")    
+                arq.write("%.2f %.2f %.2f %.2f 0.0\n" % (sect[2], aeronave.bh/2, -sect[0]/2, sect[1])) # Xle    Yle    Zle     Chord   Ainc
+                arq.write("AFILE\navl/%s.dat\n" % aeronave.perfil_ev)
+            arq.write("#fim do segundo laço\n")
+        elif aeronave.tipo_ev == "c":
+            arq.write("COMPONENT\n2\n")
+            for sect in aeronave.geometria_ev:
+                arq.write("SECTION\n")
+                arq.write("%.2f %.2f %.2f %.2f 0.0\n" % (sect[2], 0, sect[0], sect[1])) # Xle    Yle    Zle     Chord   Ainc
+                arq.write("AFILE\navl/%s.dat\n" % aeronave.perfil_ev)
+            
     arq.write("\nSURFACE\n")
     arq.write("EH\n")
     arq.write("4 1.0 6 1.0\n") # Discretização
@@ -46,17 +111,18 @@ def criar_arquivo(aeronave, efeito_solo):
         arq.write("%.2f %.2f %.2f %.2f 0.0\n" % (sect[2], sect[0], 0, sect[1])) # Xle    Yle    Zle     Chord   Ainc
         arq.write("AFILE\navl/%s.dat\n" % aeronave.perfil_eh)
 
-    arq.write("\nSURFACE\n")
-    arq.write("EV\n")
-    arq.write("4 1.0 6 1.0\n") # Discretização
-    arq.write("TRANSLATE\n")
-    arq.write("%.2f %.2f %.2f\n" % (aeronave.posicoes["ev"][0], 0, aeronave.posicoes["ev"][1]))
-    arq.write("YDUPLICATE\n0.0\n")
-    arq.write("COMPONENT\n2\n")
-    for sect in aeronave.geometria_ev:
-        arq.write("SECTION\n")
-        arq.write("%.2f %.2f %.2f %.2f 0.0\n" % (sect[2], aeronave.bh/2, sect[0], sect[1])) # Xle    Yle    Zle     Chord   Ainc
-        arq.write("AFILE\navl/%s.dat\n" % aeronave.perfil_ev)
+
+    # arq.write("\nSURFACE\n")
+    # arq.write("EV\n")
+    # arq.write("4 1.0 6 1.0\n") # Discretização
+    # arq.write("TRANSLATE\n")
+    # arq.write("%.2f %.2f %.2f\n" % (aeronave.posicoes["ev"][0], 0, aeronave.posicoes["ev"][1]))
+    # arq.write("YDUPLICATE\n0.0\n")
+    # arq.write("COMPONENT\n2\n")
+    # for sect in aeronave.geometria_ev:
+    #     arq.write("SECTION\n")
+    #     arq.write("%.2f %.2f %.2f %.2f 0.0\n" % (sect[2], aeronave.bh/2, sect[0], sect[1])) # Xle    Yle    Zle     Chord   Ainc
+    #     arq.write("AFILE\navl/%s.dat\n" % aeronave.perfil_ev)
     arq.close()
 
 def resultados_avl(aeronave, comando): # CM0, CL0, CLa, CMa, Xnp

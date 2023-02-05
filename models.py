@@ -21,13 +21,15 @@ class Monoplano:
     geometria_ev = []
     posicoes = {} # Referência: centro do bordo de ataque da asa
 
-    def __init__(self, asa, perfil_asa, iw, eh, perfil_eh, ih, ev, perfil_ev, posicoes):
+    def __init__(self, asa, perfil_asa, iw, eh, perfil_eh, ih, ev, perfil_ev, posicoes, tipo_ev = 't'):
+        self.tipo_ev = tipo_ev
         self.geometria_asa = asa.copy()
         self.geometria_eh = eh.copy()
         self.geometria_ev = ev.copy()
         self.posicoes = posicoes.copy()
         self.atualizar_geometria()
-        self.xcg = 0.2*self.cw
+        self.xcg = 0.3*self.cw
+        #print("Centro de gravidade: ", self.xcg)
         self.iw = iw
         self.ih = ih
         #self.atualizar_constantes()
@@ -65,7 +67,7 @@ class Monoplano:
         self.CLmax = self.resgnd['CL'] + (astall - self.iw)*self.resgnd['CLa']
         aero = desempenho(g, mu, self.K, self.CLmax, self.CD0, self.hw, self.bw, self.Sw, rho, '14x7')
         self.mtow = aero.Mtow
-        self.xcg, self.carga_paga, self.peso_vazio = self.estimar_cg() #dados desatualizados
+        #self.xcg, self.carga_paga, self.peso_vazio = self.estimar_cg() #dados desatualizados
         self.vestol = math.sqrt(2*self.mtow*g/(rho*self.Sw*self.CLmax))
 
         vd = 1.2*self.vestol
@@ -97,7 +99,10 @@ class Monoplano:
         self.lv = self.posicoes["ev"][0] - 0.25*(self.cw - self.cv)
         self.VH = (self.lh*self.Sh)/(self.cw*self.Sw)
         self.VV = (self.Sv*self.lv)*2/(self.Sw*self.bw)
-
+        if self.tipo_ev == "u":
+            self.VV*=2
+        elif self.tipo_ev == "h":
+            self.VV*=4
     # def polar_arrasto(self, CL, phi):
     #     return self.CD0 + phi*self.K*(CL**2)
 
@@ -118,63 +123,63 @@ class Monoplano:
         #mostrar_polar = plt.show()
         
 
-    def estimar_cg(self):
-        massaHELICE2021 = 0.11174  # ajustar #
-        bracoHELICE2019 = 0.0089
-        momentoHELICE = g * massaHELICE2021 * bracoHELICE2019
+    # def estimar_cg(self):
+    #     massaHELICE2021 = 0.11174  # ajustar #
+    #     bracoHELICE2019 = 0.0089
+    #     momentoHELICE = g * massaHELICE2021 * bracoHELICE2019
 
-        massaMOTOR2021 = 0.7034  # ajustar #
-        bracoMOTOR2019 = 0.0974  # ajustar #
-        momentoMOTOR = g * massaMOTOR2021 * bracoMOTOR2019
+    #     massaMOTOR2021 = 0.7034  # ajustar #
+    #     bracoMOTOR2019 = 0.0974  # ajustar #
+    #     momentoMOTOR = g * massaMOTOR2021 * bracoMOTOR2019
 
-        massaTANQUEVAZIO2021 = 0.037  # ajustar #
-        bracoTANQUEVAZIO2019 = 0.1885
-        momentoTANQUEVAZIO = g * massaTANQUEVAZIO2021 * bracoTANQUEVAZIO2019
+    #     massaTANQUEVAZIO2021 = 0.037  # ajustar #
+    #     bracoTANQUEVAZIO2019 = 0.1885
+    #     momentoTANQUEVAZIO = g * massaTANQUEVAZIO2021 * bracoTANQUEVAZIO2019
 
-        massaCAIXAELETRICO2019 = 0.13244
-        bracoCAIXAELETRICO2019 = 0.2588
-        momentoCAIXAELETRICO = g * massaCAIXAELETRICO2019 * bracoCAIXAELETRICO2019
+    #     massaCAIXAELETRICO2019 = 0.13244
+    #     bracoCAIXAELETRICO2019 = 0.2588
+    #     momentoCAIXAELETRICO = g * massaCAIXAELETRICO2019 * bracoCAIXAELETRICO2019
 
-        massaFUSELAGEM2019 = 0.40628
-        bracoFUSELAGEM2019 = 0.4846
-        momentoFUSELAGEM = g * massaFUSELAGEM2019 * bracoFUSELAGEM2019
+    #     massaFUSELAGEM2019 = 0.40628
+    #     bracoFUSELAGEM2019 = 0.4846
+    #     momentoFUSELAGEM = g * massaFUSELAGEM2019 * bracoFUSELAGEM2019
 
-        massaEH2019 = 0.16235
-        areaEH2019 = 0.21
+    #     massaEH2019 = 0.16235
+    #     areaEH2019 = 0.21
 
-        massaEH2021 = (self.bh * self.ch) * (massaEH2019 / areaEH2019)
-        bracoEH2021 = 0.25 + self.Xacw + self.lh + 0.15 * self.ch
-        momentoEH = g * massaEH2021 * bracoEH2021
+    #     massaEH2021 = (self.bh * self.ch) * (massaEH2019 / areaEH2019)
+    #     bracoEH2021 = 0.25 + self.Xacw + self.lh + 0.15 * self.ch
+    #     momentoEH = g * massaEH2021 * bracoEH2021
 
-        massaEV2019 = 0.06406
-        areaEV2019 = 0.10236
+    #     massaEV2019 = 0.06406
+    #     areaEV2019 = 0.10236
 
-        massaEV2021 = 2*self.Sv * (massaEV2019 / areaEV2019)
-        bracoEV2021 = 0.25 + self.Xacw + self.lv + 0.1 * self.cv
-        momentoEV = g * massaEV2021 * bracoEV2021
+    #     massaEV2021 = 2*self.Sv * (massaEV2019 / areaEV2019)
+    #     bracoEV2021 = 0.25 + self.Xacw + self.lv + 0.1 * self.cv
+    #     momentoEV = g * massaEV2021 * bracoEV2021
 
-        massaASA2019 = 0.73368
-        areaASA2019 = 0.9
+    #     massaASA2019 = 0.73368
+    #     areaASA2019 = 0.9
 
-        massaASA2021 = self.Sw * (massaASA2019 / areaASA2019)
-        bracoASA2021 = 0.25 + 0.4 * self.cw  # considerando que o berco do motor tera 0.25 e o CG da asa sera em 40 % da cma #
-        momentoASA = g * massaASA2021 * bracoASA2021
+    #     massaASA2021 = self.Sw * (massaASA2019 / areaASA2019)
+    #     bracoASA2021 = 0.25 + 0.4 * self.cw  # considerando que o berco do motor tera 0.25 e o CG da asa sera em 40 % da cma #
+    #     momentoASA = g * massaASA2021 * bracoASA2021
 
-        carga_paga = self.mtow - (massaHELICE2021 + massaMOTOR2021 + massaTANQUEVAZIO2021 + massaCAIXAELETRICO2019 + massaFUSELAGEM2019 + massaASA2021 + massaEH2021 + massaEV2021)
+    #     carga_paga = self.mtow - (massaHELICE2021 + massaMOTOR2021 + massaTANQUEVAZIO2021 + massaCAIXAELETRICO2019 + massaFUSELAGEM2019 + massaASA2021 + massaEH2021 + massaEV2021)
 
-        massaCARGAPAGA = carga_paga  # ajustar #
-        bracoCARGAPAGA2019 = 0.25 + self.posicoes['cp'][0]
-        momentoCARGAPAGA = g * massaCARGAPAGA * bracoCARGAPAGA2019
+    #     massaCARGAPAGA = carga_paga  # ajustar #
+    #     bracoCARGAPAGA2019 = 0.25 + self.posicoes['cp'][0]
+    #     momentoCARGAPAGA = g * massaCARGAPAGA * bracoCARGAPAGA2019
 
-        SomaMomentos = momentoHELICE + momentoMOTOR + momentoTANQUEVAZIO + momentoCAIXAELETRICO + momentoFUSELAGEM + \
-                        momentoASA + momentoEH + momentoEV + momentoCARGAPAGA
-        SomaPesos = g * self.mtow
+    #     SomaMomentos = momentoHELICE + momentoMOTOR + momentoTANQUEVAZIO + momentoCAIXAELETRICO + momentoFUSELAGEM + \
+    #                     momentoASA + momentoEH + momentoEV + momentoCARGAPAGA
+    #     SomaPesos = g * self.mtow
 
-        XCG = SomaMomentos / SomaPesos
+    #     XCG = SomaMomentos / SomaPesos
 
-        PosXCG = XCG - 0.25
-        peso_vazio = self.mtow - carga_paga
-        return PosXCG, carga_paga, peso_vazio
+    #     PosXCG = XCG - 0.25
+    #     peso_vazio = self.mtow - carga_paga
+    #     return PosXCG, carga_paga, peso_vazio
     
     def decolagem(self):
         CL = self.resgnd['CL']
@@ -364,7 +369,7 @@ class Monoplano:
         res += 20*func_erro(self.CLtrim, CLcruzeiro - 0.1, CLcruzeiro + 0.1)
         res += 5*func_erro(self.ARw, 4, 8)
         res += 50*func_erro(self.ARh, 3, 5)
-        res += 1200*(self.carga_paga)**2
+        #res += 1200*(self.carga_paga)**2
         self.nota = res
     
     def calcula_nota_competicao(self):

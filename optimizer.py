@@ -36,7 +36,7 @@ ih_max = -7
 mtow_min = 14
 mtow_max = 16
 
-offset_max = 0.4
+offset_max = 0.15
 n_sect = 3
 dist_nariz = 0.295 
 soma_dims = 3.2 - dist_nariz
@@ -53,12 +53,16 @@ def gerar_inicial(total):
     aeronaves = []
     for i in range(total):
         cr = random.uniform(c_min_w, c_max_w)
-        ct = random.uniform(c_min_w, cr)
-        br = random.uniform(b_min_w/2, b_max_w/2 - 0.1)
+        cint = random.uniform(c_min_w, cr)
+        ct = random.uniform(c_min_w, cint)
+        br = random.uniform(b_min_w/2, b_max_w/2 - 0.5)
         bt = random.uniform(0.1, b_max_w/2 - br)
         o1 = random.uniform(0, offset_max)
+        o2 = random.uniform(o1,offset_max)
         b = br + bt
-        geometria_asa = [(0, cr, 0), (br, cr, 0), (b, ct, o1)]
+        bint = random.uniform(((b - br)*0.3) + br, ((b - br)*0.7) + br)
+        
+        geometria_asa = [(0, cr, 0), (br, cr, 0), (bint, cint, o1), (b, ct, o2)]
 
         bh = random.uniform(b_min_h/2, b_max_h/2)
         ch = random.uniform(c_min_h, c_max_h)
@@ -99,15 +103,17 @@ def variar(aeronave, sigma):  # função para variar os paramestros de uma aeron
     geometria_eh = aeronave.geometria_eh.copy()
     geometria_ev = aeronave.geometria_ev.copy()
 
-    br, cr, o1 = geometria_asa[1]
-    b, ct, o2 = geometria_asa[2]
+    br, cr, o1x = geometria_asa[1]
+    bint, cint, o1 = geometria_asa[2]
+    b, ct, o2 = geometria_asa[3]
     bt = b - br
 
     ch, bh = geometria_eh[0][1], geometria_eh[1][0]
     crv, ctv, bv = ch, geometria_ev[1][1], geometria_ev[1][0]
     pos_cp = aeronave.posicoes['cp'][0]
 
-    br = round(trunc_gauss(br, sigma, b_min_w/2, b_max_w/2 - 0.1), 2)
+    cint = round(trunc_gauss(cint, sigma, c_min_w, cr, 2))
+    br = round(trunc_gauss(br, sigma, b_min_w/2, b_max_w/2 - 0.5), 2)
     bt = round(trunc_gauss(bt, sigma, 0.1, b_max_w/2 - bt), 2)
     cr = round(trunc_gauss(cr, sigma, ct, c_max_w), 2)
     o1 = round(trunc_gauss(o1, sigma, 0, offset_max), 2)
@@ -116,6 +122,9 @@ def variar(aeronave, sigma):  # função para variar os paramestros de uma aeron
 
     ch = round(trunc_gauss(ch, sigma, c_min_h, c_max_h), 2)
     bh = round(trunc_gauss(bh, sigma, b_min_h/2, b_max_h/2), 2)
+
+    o2 = round(trunc_gauss(o2, sigma, o1, offset_max))
+    bint = round(trunc_gauss(bint, sigma,((b - br)*0.3) + br, ((b - br)*0.7) + br), 2)
 
     lambda_v = ctv/crv
     lambda_v = trunc_gauss(lambda_v, sigma, lambda_min_v, lambda_max_v)
@@ -137,7 +146,7 @@ def variar(aeronave, sigma):  # função para variar os paramestros de uma aeron
 
     pos_cp = round(trunc_gauss(pos_cp, sigma, pos_cp_min*cr, pos_cp_max*cr), 2)
 
-    geometria_asa = [(0, cr, 0), (br, cr, 0), (b, ct, o1)]
+    geometria_asa = [(0, cr, 0), (br, cr, 0), (bint, cint, o1), (b, ct, o2)]
     geometria_eh = [(0, ch, 0), (bh, ch, 0)]
     geometria_ev = [(0, crv, 0), (bv, ctv, crv-ctv)]
 
@@ -156,22 +165,29 @@ def gerarFilho(pai, mae, sigma, indiceMutacao):
     geometria_evMae = mae.geometria_ev.copy()
 
     #dados da aeronave pai
-    brPai, crPai, o1Pai = geometria_asaPai[1]
-    bPai, ctPai, o2Pai = geometria_asaPai[2]
+    brPai, crPai, o1xPai = geometria_asaPai[1]
+    bintPai, cintPai, o1Pai = geometria_asaMae[2]
+    bPai, ctPai, o2Pai = geometria_asa[3]
+
     btPai = bPai - brPai
     chPai, bhPai = geometria_ehPai[0][1], geometria_ehPai[1][0]
     crvPai, ctvPai, bvPai = chPai, geometria_evPai[1][1], geometria_evPai[1][0]
     pos_cpPai = pai.posicoes['cp'][0]
 
     #dados da aeronave mae
-    brMae, crMae, o1Mae = geometria_asaMae[1]
-    bMae, ctMae, o2Mae = geometria_asaMae[2]
+    brMae, crMae, o1xMae = geometria_asaMae[1]
+    bintMae, cintMae, o1Mae = geometria_asaMae[2]
+    bMae, ctMae, o2Mae = geometria_asa[3]
+    #bint, cint, o1 = geometria_asa[2]
+    #b, ct, o2 = geometria_asa[3]
+
+    bint, cint = bintMae, cintMae
     btMae = bMae - brMae
     chMae, bhMae = geometria_ehMae[0][1], geometria_ehMae[1][0]
     crvMae, ctvMae, bvMae = chMae, geometria_evMae[1][1], geometria_evMae[1][0]
     pos_cpMae = mae.posicoes['cp'][0]
 
-    br, bt, cr, o1, ct = brMae, btPai, crMae, o1Pai, ctMae
+    br, bt, cr, o1, ct, o2 = brMae, btPai, crMae, o1Mae, ctMae, o2Mae
     b = round(bt + br, 2)
 
     ch, bh = chPai, bhMae
@@ -192,7 +208,8 @@ def gerarFilho(pai, mae, sigma, indiceMutacao):
 
     pos_cp = pos_cpMae
 
-    geometria_asa = [(0, cr, 0), (br, cr, 0), (b, ct, o1)]
+    geometria_asa = [(0, cr, 0), (br, cr, 0), (bint, cint, o1), (b, ct, o1)]
+    geometria_asa = [(0, cr, 0), (br, cr, 0), (bint, cint, o1), (b, ct, o2)]
     geometria_eh = [(0, ch, 0), (bh, ch, 0)]
     geometria_ev = [(0, crv, 0), (bv, ctv, crv-ctv)]
 

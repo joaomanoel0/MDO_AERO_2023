@@ -11,19 +11,21 @@ def criar_arquivo(aeronave, efeito_solo):
         arq = open(caminho_geometrias + aeronave.nome + '-ge' + '.avl', 'w')
         arq.write(aeronave.nome + '\n')
         arq.write('0.0\n')          # Mach
-        arq.write('0 1 %.2f\n' % -aeronave.hw) # IYsym   IZsym   Zsym
+        arq.write('0 1 0\n') # IYsym   IZsym   Zsym
         arq.write('%.2f %.2f %.2f\n' % (aeronave.Sw, aeronave.cw, aeronave.bw)) # Sref    Cref    Bref
-        arq.write('%.3f 0.0 -0.08\n' % (aeronave.xcg)) # Xref    Yref    Zref (Variei o Zcg -Paulo Robson-)
+        arq.write('%.3f 0.0  + %.3f)\n' % (aeronave.xcg, aeronave.hw)) # Xref    Yref    Zref (Variei o Zcg -Paulo Robson-)
     else:
         arq = open(caminho_geometrias + aeronave.nome + '.avl', 'w')
         arq.write(aeronave.nome + '\n')
         arq.write('0.0\n')          # Mach
         arq.write('0 0 0.0\n') # IYsym   IZsym   Zsym
         arq.write('%.2f %.2f %.2f\n' % (aeronave.Sw, aeronave.cw, aeronave.bw)) # Sref    Cref    Bref
-        arq.write('%.3f 0.0 -0.08\n' % (aeronave.xcg)) # Xref    Yref    Zref (Variei o Zcg -Paulo Robson-)
+        arq.write('%.3f 0.0 (-0.08 + %.3f)\n' % (aeronave.xcg, aeronave.hw)) # Xref    Yref    Zref (Variei o Zcg -Paulo Robson-)
     arq.write("\nSURFACE\n")
     arq.write("Asa\n")
-    arq.write("12 1.0 30 1.0\n") # Discretização
+    arq.write("12 1.0 22 1.0\n") # Discretização
+    arq.write("TRANSLATE\n")
+    arq.write("0.0 0.0 %.2f\n" % (aeronave.hw))
     arq.write("YDUPLICATE\n0.0\n")
     arq.write("ANGLE\n%.0f\n" % aeronave.iw)
     arq.write("COMPONENT\n1\n")

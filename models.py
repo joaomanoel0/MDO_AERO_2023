@@ -21,7 +21,7 @@ class Monoplano:
     geometria_ev = []
     posicoes = {} # Referência: centro do bordo de ataque da asa
 
-    def __init__(self, asa, perfil_asa, iw, eh, perfil_eh, ih, ev, perfil_ev, posicoes, tipo_ev = 't', tipo_helice = '16x8'):
+    def __init__(self, asa, perfil_asa, iw, eh, perfil_eh, ih, ev, perfil_ev, posicoes, tipo_ev = 'h', tipo_helice = '16x8'):
         self.tipo_ev = tipo_ev
         self.geometria_asa = asa.copy()
         self.geometria_eh = eh.copy()
@@ -32,6 +32,7 @@ class Monoplano:
         self.pos_eh = [self.posicoes["eh"][0]+self.geometria_eh[0][1], self.posicoes["eh"][0], self.geometria_eh[0][1]] #ponto maximo x, ponto minimo x, comprimento eh (em relacao ao x)
         #print(self.pos_eh)
         self.envergadura = self.geometria_asa[3][0]*2
+        self.dist_solo_ev = self.dist_ev_solo()
         self.atualizar_geometria()
         self.xcg = 0.3*self.cw
         #print("Centro de gravidade: ", self.xcg)
@@ -95,6 +96,12 @@ class Monoplano:
         self.pv = 4.0 # definindo valor do peso vazio 
         self.cp = self.mtow - self.pv
         self.calcula_nota_competicao()
+
+    def dist_ev_solo(self):
+        if self.tipo_ev == "h":
+            return self.posicoes["ev"][1] - self.geometria_ev[1][0]/2
+        else:
+            return self.posicoes["ev"][1]
 
     def calcula_altura(self):
         if self.tipo_ev == "h":

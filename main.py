@@ -1,5 +1,6 @@
 from models import Monoplano
-from matplotlib import pyplot as plt
+from matplotlib import pyplot
+import numpy as np
 import optimizer
 import avl
 import os
@@ -21,16 +22,17 @@ os.mkdir('./avl/configs/%s/geracao-%d' % (code, 0))
 
 avl.caminho_geometrias = './avl/configs/%s/geracao-%d/' % (code, 0)
 
-inicial = optimizer.gerar_inicial(300)
+media_notas = []
+inicial = optimizer.gerar_inicial(150)
+media_notas.append(optimizer.mediaAvaliacao(inicial))
 
 candidatos = sorted(inicial, key = lambda a : a.nota, reverse = True)[:optimizer.n_candidatos]
-#print("avaliação total 1: ")
-#print(optimizer.avaliacaoTotal(inicial))
 ant = 0
-n = 5
+n = 2
 nota_ant = -1000
 notas = []
 melhores_geracao = []
+
 for j in range(n):
     os.mkdir('./avl/configs/%s/geracao-%d' % (code, j+1))
     avl.caminho_geometrias = './avl/configs/%s/geracao-%d/' % (code,j + 1)
@@ -40,6 +42,7 @@ for j in range(n):
     print(melhor.perfil_asa, melhor.perfil_eh, melhor.perfil_ev, "geração %d: %.3f" % (j+1, melhor.nota), " | Nota na competição: ", melhor.nota_avaliacao)
     print("xcp = %.3f CLmax = %.4f atrim = %.3f Sw = %.3f ME = %.2f%% CP = %.2f pouso = %.2f decolagem = %.2f cma = %.2f arw = %.3f arh = %.3f mtow = %.3f" % (melhor.posicoes['cp'][0], melhor.CLmax, melhor.atrim, melhor.Sw, melhor.ME*100, melhor.cp, melhor.x_pouso, melhor.x_decolagem, melhor.CMa *180/3.1416, melhor.ARw, melhor.ARh, melhor.mtow))
     print("Média da geração: ", optimizer.mediaAvaliacao(candidatos))
+    media_notas.append(optimizer.mediaAvaliacao(candidatos))
     notas.append(melhor.nota_avaliacao)
     melhores_geracao.append(melhor)
     arq_melhor = open('./avl/configs/%s/geracao-%d-melhor.pyobj' % (code, j + 1), 'wb')
@@ -51,7 +54,7 @@ for j in range(n):
     # if len(notas) == 10:
     #     notas.pop(0)
 
-candidatos.sort(key=lambda a : a.nota, reverse=True)
+candidatos.sort(key=lambda a : a.nota_avaliacao, reverse=True)
 os.mkdir('./avl/configs/%s/resultado' % code)
 avl.caminho_geometrias = './avl/configs/%s/resultado/' % code
 i = 1
@@ -67,6 +70,10 @@ for melhor in candidatos[:10]:
     print("perfis eh: ", melhor.geometria_eh)
     print("Posicoes eh: ", melhor.posicoes["eh"])
     print("Posicoes ev: ", melhor.posicoes["ev"])
+    print("Largura: ", melhor.lagura_asa)
+    print("Largura: ", melhor.lagura_asa)
+    print("Pos eh: ", melhor.pos_eh)
+    print("Envergadura: ", melhor.envergadura)
     avl.criar_arquivo(melhor, False)
 
 melhores_geracao.sort(key=lambda a : a.nota, reverse=True)
@@ -80,9 +87,25 @@ for melhor in melhores_geracao[:10]:
     pickle.dump(melhor, arq_melhor)
     arq_melhor.close()
     print("%s\n  cw = %.3f CL/CD = %.4f atrim = %.3f Sw = %.3f ME = %.2f%% Mtow = %.4f pouso = %.2f decolagem = %.2f perf = %s arw = %.3f arh = %.3f xcg = %.4f" % (melhor.nome, melhor.cw, melhor.CL_CD, melhor.atrim, melhor.Sw, melhor.ME*100, melhor.mtow, melhor.x_pouso, melhor.x_decolagem, melhor.perfil_asa, melhor.ARw, melhor.ARh, melhor.xcg))
-    print("Posicoes asa: ", melhor.geometria_asa)
-    print("Posicoes ev: ", melhor.geometria_ev)
-    print("Posicoes eh: ", melhor.geometria_eh)
+    print("perfis asa: ", melhor.geometria_asa)
+    print("perfis ev: ", melhor.geometria_ev)
+    print("perfis eh: ", melhor.geometria_eh)
     print("Posicoes ev: ", melhor.posicoes["ev"])
     print("Posicoes eh: ", melhor.posicoes["eh"])
+    print("\nAltura: ", melhor.altura)
+    print("Largura: ", melhor.lagura_asa)
+    print("Pos eh: ", melhor.pos_eh)
+    print("Envergadura: ", melhor.envergadura)
     avl.criar_arquivo(melhor, False)
+
+size = 5.0
+x = np.arange(0, len(media_notas), 1)
+y = media_notas
+pyplot.figure(figsize=(2*size,size))
+pyplot.xlabel('Geração', fontsize=16)
+pyplot.ylabel('Média de notas', fontsize=16)
+pyplot.title(label="Evolução da média de notas")
+# pyplot.xlim(-0.10, 1.1)
+# pyplot.ylim(-0.24, 0.36)
+pyplot.plot(x,y)
+pyplot.savefig('Evolução da avaliação.png', format = 'png')

@@ -41,7 +41,7 @@ n_sect = 3
 altura_max = 0.6
 b_min_w = 1.5 #envergadura min
 b_max_w = 2.3 #envergadura max
-dist_min_asa_eh = 0.0
+dist_solo_ev_min = 0.06
 
 # perfis_asa = ['FX 74-Cl5-140 MOD (smoothed)', 'S1223 RTL', 'CH10 (smoothed)', 'DAE-21 AIRFOIL', 'WORTMANN FX 63-137 AIRFOIL', 'e423']
 # perfis_eh = ['e168', 'e169', 'e479', 'n0012', 'naca0015']
@@ -98,6 +98,7 @@ def gerar_inicial(total):
         perfil_ev = random.choice(perfis_ev)
         try:
             aeronave = Monoplano(geometria_asa, perfil_asa, iw, geometria_eh, perfil_eh, ih, geometria_ev, perfil_ev, posicoes)
+            #print("append")
             aeronaves.append(aeronave)
         except:
             continue
@@ -234,9 +235,7 @@ def gerarFilho(pai, mae, sigma, indiceMutacao):
         except:
             variar += 1
             if variar >= 4:
-                #print(variar)
-                aeronave = variar(pai, sigma)
-                return aeronave
+                return pai
             else:
                 continue
             # return pai
@@ -292,10 +291,8 @@ def reproducao2(populacao, n_filhos, sigma, mutacao = 0.4):
         pai, mae = selecaoRoleta(candidatos)
         #print("ok2.1")
         filho1, filho2 = gerarFilho(pai, mae, sigma, mutacao), variar(individuo, sigma)
-        if verifica_cond(filho1) and verifica_cond(filho2):
-            #print("ok2.2")
-            filhos.append(filho1)
-            filhos.append(filho2)
+        if verifica_cond(filho1): filhos.append(filho1)
+        if verifica_cond(filho2): filhos.append(filho2)
         # filhos.append(gerarFilho(pai, mae, sigma, mutacao))
         # filhos.append(variar(individuo, sigma))
     return filhos
@@ -305,5 +302,7 @@ def verifica_cond(aeronave):
     if aeronave.altura > altura_max:
         retorno = False
     if aeronave.envergadura > b_max_w:
+        retorno = False
+    if aeronave.dist_solo_ev < dist_solo_ev_min:
         retorno = False
     return retorno

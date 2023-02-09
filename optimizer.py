@@ -6,8 +6,8 @@ from classe_desempenho import desempenho
 # from random import *
 
 n_candidatos = 150
-n_selecionados = 50
-n_filhos = 150
+n_selecionados = 25
+n_filhos = 50
 
 
 c_min_w = 0.2
@@ -107,7 +107,7 @@ def gerar_inicial(total):
 
 def variar(aeronave, sigma):  # função para variar os paramestros de uma aeronave
     while True:
-        print("Variar")
+        #print("Variar")
         geometria_asa = aeronave.geometria_asa.copy()
         geometria_eh = aeronave.geometria_eh.copy()
         geometria_ev = aeronave.geometria_ev.copy()
@@ -168,8 +168,10 @@ def variar(aeronave, sigma):  # função para variar os paramestros de uma aeron
 
 
 def gerarFilho(pai, mae, sigma, indiceMutacao):
+    variar = 0
     while True:
-        print("GerarF")
+        #print("GerarF")
+        #print(variar)
         geometria_asaPai = pai.geometria_asa.copy()
         geometria_ehPai = pai.geometria_eh.copy()
         geometria_evPai = pai.geometria_ev.copy()
@@ -179,57 +181,64 @@ def gerarFilho(pai, mae, sigma, indiceMutacao):
         posicoes_Mae = mae.posicoes.copy()
 
         #dados da aeronave pai
-        brPai, crPai, o1xPai = geometria_asaPai[1]
-        bintPai, cintPai, o1Pai = geometria_asaPai[2]
-        bPai, ctPai, o2Pai = geometria_asaPai[3]
+        # brPai, crPai, o1xPai = geometria_asaPai[1]
+        # bintPai, cintPai, o1Pai = geometria_asaPai[2]
+        # bPai, ctPai, o2Pai = geometria_asaPai[3]
 
-        btPai = bPai - brPai
-        chPai, bhPai = geometria_ehPai[0][1], geometria_ehPai[1][0]
-        crvPai, ctvPai, bvPai = chPai, geometria_evPai[1][1], geometria_evPai[1][0]
-        pos_cpPai = pai.posicoes['cp'][0]
+        # btPai = bPai - brPai
+        # chPai, bhPai = geometria_ehPai[0][1], geometria_ehPai[1][0]
+        # crvPai, ctvPai, bvPai = chPai, geometria_evPai[1][1], geometria_evPai[1][0]
+        # pos_cpPai = pai.posicoes['cp'][0]
 
-        #dados da aeronave mae
-        brMae, crMae, o1xMae = geometria_asaMae[1]
-        bintMae, cintMae, o1Mae = geometria_asaMae[2]
-        bMae, ctMae, o2Mae = geometria_asaMae[3]
+        # #dados da aeronave mae
+        # brMae, crMae, o1xMae = geometria_asaMae[1]
+        # bintMae, cintMae, o1Mae = geometria_asaMae[2]
+        # bMae, ctMae, o2Mae = geometria_asaMae[3]
 
-        bint, cint = bintMae, cintMae
-        btMae = bMae - brMae
-        chMae, bhMae = geometria_ehMae[0][1], geometria_ehMae[1][0]
-        crvMae, ctvMae, bvMae = chMae, geometria_evMae[1][1], geometria_evMae[1][0]
-        pos_cpMae = mae.posicoes['cp'][0]
+        # bint, cint = bintMae, cintMae
+        # btMae = bMae - brMae
+        # chMae, bhMae = geometria_ehMae[0][1], geometria_ehMae[1][0]
+        # crvMae, ctvMae, bvMae = chMae, geometria_evMae[1][1], geometria_evMae[1][0]
+        # pos_cpMae = mae.posicoes['cp'][0]
 
-        br, bt, cr, o1, ct, o2 = brMae, btMae, crMae, o1Mae, ctMae, o2Mae
-        b = round(bt + br, 2)
-        b = round(trunc_gauss(b, sigma, 0.1, 1.15), 2)
+        # br, bt, cr, o1, ct, o2 = brMae, btMae, crMae, o1Mae, ctMae, o2Mae
+        # b = round(bt + br, 2)
+        # b = round(trunc_gauss(b, sigma, 0.1, 1.15), 2)
 
-        ch, bh = chPai, bhPai
+        # ch, bh = chPai, bhPai
 
-        lambda_v = ctvPai/crvPai
+        # lambda_v = ctvPai/crvPai
 
-        crv, ctv, bv = crvMae, ctvMae, bvMae
+        # crv, ctv, bv = crvMae, ctvMae, bvMae
 
-        iw, ih = pai.iw, mae.ih
+        # iw, ih = pai.iw, mae.ih
 
-        ht = round(pai.posicoes['eh'][1], 2)
+        # ht = round(pai.posicoes['eh'][1], 2)
 
-        lt = round(mae.posicoes['eh'][0], 2)
+        # lt = round(mae.posicoes['eh'][0], 2)
 
-        pos_cp = pos_cpMae
+        # pos_cp = pos_cpMae
 
-        geometria_asa = [(0, cr, 0), (br, cr, 0), (bint, cint, o1), (b, ct, o2)]
-        geometria_eh = [(0, ch, 0), (bh, ch, 0)]
-        geometria_ev = [(0, crv, 0), (bv, ctv, crv-ctv)]
+        # geometria_asa = [(0, cr, 0), (br, cr, 0), (bint, cint, o1), (b, ct, o2)]
+        # geometria_eh = [(0, ch, 0), (bh, ch, 0)]
+        # geometria_ev = [(0, crv, 0), (bv, ctv, crv-ctv)]
 
-        posicoes = {'asa': (0, 0), 'eh': (lt, ht),
-                    'ev': (lt, ht), 'cp': (pos_cp, 0)}
+        # posicoes = {'asa': (0, 0), 'eh': (lt, ht),
+        #             'ev': (lt, ht), 'cp': (pos_cp, 0)}
         try: 
             aeronave = Monoplano(geometria_asaPai, pai.perfil_asa, mae.iw, geometria_ehMae, mae.perfil_eh, pai.ih, geometria_evPai, pai.perfil_ev, posicoes_Mae)
             if indiceMutacao > random.random():
                 aeronave = variar(aeronave, sigma)
+            #print("ok")
             return aeronave
         except:
-            continue
+            variar += 1
+            if variar >= 4:
+                #print(variar)
+                aeronave = variar(pai, sigma)
+                return aeronave
+            else:
+                continue
             # return pai
 
 
@@ -281,10 +290,10 @@ def reproducao2(populacao, n_filhos, sigma, mutacao = 0.4):
     filhos = []
     for individuo in candidatos:
         pai, mae = selecaoRoleta(candidatos)
-        print("ok2.1")
+        #print("ok2.1")
         filho1, filho2 = gerarFilho(pai, mae, sigma, mutacao), variar(individuo, sigma)
         if verifica_cond(filho1) and verifica_cond(filho2):
-            print("ok2.2")
+            #print("ok2.2")
             filhos.append(filho1)
             filhos.append(filho2)
         # filhos.append(gerarFilho(pai, mae, sigma, mutacao))

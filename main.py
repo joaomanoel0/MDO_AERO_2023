@@ -23,7 +23,7 @@ os.mkdir('./avl/configs/%s/geracao-%d' % (code, 0))
 avl.caminho_geometrias = './avl/configs/%s/geracao-%d/' % (code, 0)
 
 media_notas = []
-inicial = optimizer.gerar_inicial(150)
+inicial = optimizer.gerar_inicial(100)
 media_notas.append(optimizer.mediaAvaliacao(inicial))
 
 candidatos = sorted(inicial, key = lambda a : a.nota, reverse = True)[:optimizer.n_candidatos]
@@ -58,7 +58,7 @@ candidatos.sort(key=lambda a : a.nota_avaliacao, reverse=True)
 os.mkdir('./avl/configs/%s/resultado' % code)
 avl.caminho_geometrias = './avl/configs/%s/resultado/' % code
 i = 1
-for melhor in candidatos[:10]:
+for melhor in candidatos[:20]:
     melhor.nome = '%d'%i
     i += 1
     arq_melhor = open('./avl/configs/%s/resultado/%s.pyobj' % (code, melhor.nome), 'wb')
@@ -74,13 +74,14 @@ for melhor in candidatos[:10]:
     print("Largura: ", melhor.lagura_asa)
     print("Pos eh: ", melhor.pos_eh)
     print("Envergadura: ", melhor.envergadura)
+    print("Solo ev: ", melhor.dist_solo_ev)
     avl.criar_arquivo(melhor, False)
 
 melhores_geracao.sort(key=lambda a : a.nota, reverse=True)
 os.mkdir('./avl/configs/%s/melhores_geracao' % code)
 avl.caminho_geometrias = './avl/configs/%s/melhores_geracao/' % code
 i = 1
-for melhor in melhores_geracao[:10]:
+for melhor in melhores_geracao:
     melhor.nome = '%d'%i
     i += 1
     arq_melhor = open('./avl/configs/%s/resultado/%s.pyobj' % (code, melhor.nome), 'wb')
@@ -96,6 +97,7 @@ for melhor in melhores_geracao[:10]:
     print("Largura: ", melhor.lagura_asa)
     print("Pos eh: ", melhor.pos_eh)
     print("Envergadura: ", melhor.envergadura)
+    print("Solo ev: ", melhor.dist_solo_ev)
     avl.criar_arquivo(melhor, False)
 
 size = 5.0
@@ -105,7 +107,5 @@ pyplot.figure(figsize=(2*size,size))
 pyplot.xlabel('Geração', fontsize=16)
 pyplot.ylabel('Média de notas', fontsize=16)
 pyplot.title(label="Evolução da média de notas")
-# pyplot.xlim(-0.10, 1.1)
-# pyplot.ylim(-0.24, 0.36)
 pyplot.plot(x,y)
 pyplot.savefig('Evolução da avaliação.png', format = 'png')

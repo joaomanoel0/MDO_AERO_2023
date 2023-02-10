@@ -5,9 +5,9 @@ from operator import attrgetter
 from classe_desempenho import desempenho
 # from random import *
 
-n_selecionados = 300
-n_filhos = 300
-n_candidatos = 300
+n_selecionados = 500 # reprodução 1
+n_filhos = 450
+n_candidatos = 500
 
 
 c_min_w = 0.2
@@ -95,7 +95,7 @@ def gerar_inicial(total):
             aeronave = Monoplano(geometria_asa, perfil_asa, iw, geometria_eh, perfil_eh, ih, geometria_ev, perfil_ev, posicoes)
             if verifica_cond(aeronave):
                 contador += 1
-                print(contador)
+                #print(contador)
                 aeronaves.append(aeronave)
         except:
             continue
@@ -254,7 +254,7 @@ def reproducao2(populacao, sigma, mutacao = 0.4):
         filho = variar(ordenados[contador], sigma)
         if verifica_cond(filho): 
             filhos.append(filho)
-            print("Contaodor reprodução: ", contador)
+            #print("Contaodor reprodução: ", contador)
             if verifica_cond_est(filho): 
                 atendem_estabilidade.append(filho)
         contador += 1

@@ -141,65 +141,6 @@ class Monoplano:
         plt.xlabel('Coeficiente de arrasto (Cd)')
         plt.ylabel('Coeficiente de sustentação (Cl)')
         #mostrar_polar = plt.show()
-        
-
-    # def estimar_cg(self):
-    #     massaHELICE2021 = 0.11174  # ajustar #
-    #     bracoHELICE2019 = 0.0089
-    #     momentoHELICE = g * massaHELICE2021 * bracoHELICE2019
-
-    #     massaMOTOR2021 = 0.7034  # ajustar #
-    #     bracoMOTOR2019 = 0.0974  # ajustar #
-    #     momentoMOTOR = g * massaMOTOR2021 * bracoMOTOR2019
-
-    #     massaTANQUEVAZIO2021 = 0.037  # ajustar #
-    #     bracoTANQUEVAZIO2019 = 0.1885
-    #     momentoTANQUEVAZIO = g * massaTANQUEVAZIO2021 * bracoTANQUEVAZIO2019
-
-    #     massaCAIXAELETRICO2019 = 0.13244
-    #     bracoCAIXAELETRICO2019 = 0.2588
-    #     momentoCAIXAELETRICO = g * massaCAIXAELETRICO2019 * bracoCAIXAELETRICO2019
-
-    #     massaFUSELAGEM2019 = 0.40628
-    #     bracoFUSELAGEM2019 = 0.4846
-    #     momentoFUSELAGEM = g * massaFUSELAGEM2019 * bracoFUSELAGEM2019
-
-    #     massaEH2019 = 0.16235
-    #     areaEH2019 = 0.21
-
-    #     massaEH2021 = (self.bh * self.ch) * (massaEH2019 / areaEH2019)
-    #     bracoEH2021 = 0.25 + self.Xacw + self.lh + 0.15 * self.ch
-    #     momentoEH = g * massaEH2021 * bracoEH2021
-
-    #     massaEV2019 = 0.06406
-    #     areaEV2019 = 0.10236
-
-    #     massaEV2021 = 2*self.Sv * (massaEV2019 / areaEV2019)
-    #     bracoEV2021 = 0.25 + self.Xacw + self.lv + 0.1 * self.cv
-    #     momentoEV = g * massaEV2021 * bracoEV2021
-
-    #     massaASA2019 = 0.73368
-    #     areaASA2019 = 0.9
-
-    #     massaASA2021 = self.Sw * (massaASA2019 / areaASA2019)
-    #     bracoASA2021 = 0.25 + 0.4 * self.cw  # considerando que o berco do motor tera 0.25 e o CG da asa sera em 40 % da cma #
-    #     momentoASA = g * massaASA2021 * bracoASA2021
-
-    #     carga_paga = self.mtow - (massaHELICE2021 + massaMOTOR2021 + massaTANQUEVAZIO2021 + massaCAIXAELETRICO2019 + massaFUSELAGEM2019 + massaASA2021 + massaEH2021 + massaEV2021)
-
-    #     massaCARGAPAGA = carga_paga  # ajustar #
-    #     bracoCARGAPAGA2019 = 0.25 + self.posicoes['cp'][0]
-    #     momentoCARGAPAGA = g * massaCARGAPAGA * bracoCARGAPAGA2019
-
-    #     SomaMomentos = momentoHELICE + momentoMOTOR + momentoTANQUEVAZIO + momentoCAIXAELETRICO + momentoFUSELAGEM + \
-    #                     momentoASA + momentoEH + momentoEV + momentoCARGAPAGA
-    #     SomaPesos = g * self.mtow
-
-    #     XCG = SomaMomentos / SomaPesos
-
-    #     PosXCG = XCG - 0.25
-    #     peso_vazio = self.mtow - carga_paga
-    #     return PosXCG, carga_paga, peso_vazio
     
     def decolagem(self):
         CL = self.resgnd['CL']
@@ -360,12 +301,12 @@ class Monoplano:
         return x
 
     def avaliar(self):
-        res = self.nota_avaliacao
+        res = (self.nota_avaliacao*100)
 
         if self.ME >= 0.05 and self.ME <= 0.15:
             res += 100*self.ME
         else:
-            res -= 100*abs(self.ME)
+            res -= 1000*abs(self.ME)
 
         if self.atrim >= 3 and self.atrim <= 12:
             res += 100*self.atrim
@@ -393,9 +334,11 @@ class Monoplano:
             res -= 20*abs(self.res0['Cnb'] * 180/pi)
 
         if self.Sst >= 1:
-            res += 10*self.Sst
-        else:
+            res += 1000*self.Sst
+        elif self.Sst >= 0.8:
             res -= 100*self.Sst
+        else:
+            res -= 1000*self.Sst
 
         self.nota = res
         # Requesitos de estabilidade estática e dinâmica (sadraey tabela 6.3)

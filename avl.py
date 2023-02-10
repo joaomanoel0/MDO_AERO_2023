@@ -24,7 +24,7 @@ def criar_arquivo(aeronave, efeito_solo):
 
     arq.write("\nSURFACE\n")
     arq.write("Asa\n")
-    arq.write("12 1.0 22 1.0\n") # Discretização
+    arq.write("8 1.0 15 1.0\n") # Discretização
     arq.write("TRANSLATE\n")
     arq.write("0.0 0.0 %.2f\n" % (aeronave.hw))
     arq.write("YDUPLICATE\n0.0\n")

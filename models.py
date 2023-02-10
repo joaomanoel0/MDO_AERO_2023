@@ -302,44 +302,13 @@ class Monoplano:
 
     def avaliar(self):
         res = (self.nota_avaliacao*100)
-
-        if self.ME >= 0.05 and self.ME <= 0.15:
-            res += 100*self.ME
-        else:
-            res -= 1000*abs(self.ME)
-
-        if self.atrim >= 3 and self.atrim <= 12:
-            res += 100*self.atrim
-        else:
-            res -= 100*abs(self.atrim)
-        
-        if self.CMa * 180/pi >= -0.1 and self.CMa * 180/pi <= 0.8:
-            res += 20*abs(self.CMa * 180/pi)
-        else:
-            res -= 20*abs(self.CMa * 180/pi)
-
-        if self.res0['CMq'] * 180/pi >= -40 and self.res0['CMq'] * 180/pi <= -5:
-            res += 20*abs(self.CMa * 180/pi)
-        else:
-            res -= 20*abs(self.CMa * 180/pi)
-
-        if self.res0['Cnb'] * 180/pi >= 0.05 and self.res0['Cnb'] * 180/pi <= 0.4:
-            res += 20*abs(self.res0['Cnb'] * 180/pi)
-        else:
-            res -= 20*abs(self.res0['Cnb'])
-
-        if self.res0['Cnr'] * 180/pi >= -1 and self.res0['Cnr'] * 180/pi <= -0.1:
-            res += 20*abs(self.res0['Cnb'] * 180/pi)
-        else:
-            res -= 20*abs(self.res0['Cnb'] * 180/pi)
-
-        if self.Sst >= 1:
-            res += 1000*self.Sst
-        elif self.Sst >= 0.8:
-            res -= 100*self.Sst
-        else:
-            res -= 1000*self.Sst
-
+        res += 1000*func_erro(self.ME, 0.05, 0.15)
+        res += 1000*func_erro(self.atrim, 3, 12)
+        res += 20*func_erro(self.CMa * 180/pi, -0.1, 0.8)
+        res += 20*func_erro(self.res0['CMq'] * 180/pi, -40, -5)
+        res += 20*func_erro(self.res0['Cnb'] * 180/pi, 0.05, 0.4)
+        res += 20*func_erro(self.res0['Cnr'] * 180/pi, -1, -0.1)
+        res += func_erro_neg(1, self.Sst, 1000)
         self.nota = res
         # Requesitos de estabilidade estática e dinâmica (sadraey tabela 6.3)
         # CLcruzeiro = (2*g*self.mtow)/(rho*(v_cruzeiro**2)*self.Sw)

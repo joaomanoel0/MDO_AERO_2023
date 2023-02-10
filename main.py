@@ -23,7 +23,7 @@ os.mkdir('./avl/configs/%s/geracao-%d' % (code, 0))
 avl.caminho_geometrias = './avl/configs/%s/geracao-%d/' % (code, 0)
 
 media_notas = []
-inicial = optimizer.gerar_inicial(600)
+inicial = optimizer.gerar_inicial(100)
 media_notas.append(optimizer.mediaAvaliacao(inicial))
 
 candidatos = sorted(inicial, key = lambda a : a.nota, reverse = True)[:optimizer.n_candidatos]
@@ -33,7 +33,7 @@ print("xcp = %.3f CLmax = %.4f atrim = %.3f Sw = %.3f ME = %.2f%% CP = %.2f pous
 print("Nome melhor: ", melhor.nome)
 print("Média da geração: ", optimizer.mediaAvaliacao(candidatos))
 ant = 0
-n = 50
+n = 5
 nota_ant = -1000
 notas = []
 melhores_geracao = []
@@ -59,6 +59,7 @@ for j in range(n):
     arq_melhor = open('./avl/configs/%s/geracao-%d-melhor.pyobj' % (code, j + 1), 'wb')
     pickle.dump(melhor, arq_melhor)
     arq_melhor.close()
+    avl.criar_arquivo(melhor, False)
     shutil.rmtree('./avl/configs/%s/geracao-%d/' % (code, j + 1))
     if abs(melhor.nota - sum(notas)/10) < 0.5 and len(notas) == 10:
         break
@@ -75,7 +76,7 @@ for melhor in candidatos[:20]:
     arq_melhor = open('./avl/configs/%s/resultado/%s.pyobj' % (code, melhor.nome), 'wb')
     pickle.dump(melhor, arq_melhor)
     arq_melhor.close()
-    print("%s\n  cw = %.3f CL/CD = %.4f atrim = %.3f Sw = %.3f ME = %.2f%% Mtow = %.4f pouso = %.2f decolagem = %.2f perf = %s arw = %.3f arh = %.3f" % (melhor.nome, melhor.cw, melhor.CL_CD, melhor.atrim, melhor.Sw, melhor.ME*100, melhor.mtow, melhor.x_pouso, melhor.x_decolagem, melhor.perfil_asa, melhor.ARw, melhor.ARh))
+    print("%s\n  cw = %.3f CL/CD = %.4f atrim = %.3f Sw = %.3f ME = %.2f%% Mtow = %.4f pouso = %.2f decolagem = %.2f perf = %s arw = %.3f arh = %.3f Sst = %.3f " % (melhor.nome, melhor.cw, melhor.CL_CD, melhor.atrim, melhor.Sw, melhor.ME*100, melhor.mtow, melhor.x_pouso, melhor.x_decolagem, melhor.perfil_asa, melhor.ARw, melhor.ARh, melhor.Sst))
     print("perfis asa: ", melhor.geometria_asa)
     print("perfis ev: ", melhor.geometria_ev)
     print("perfis eh: ", melhor.geometria_eh)
@@ -97,7 +98,7 @@ for melhor in melhores_geracao:
     arq_melhor = open('./avl/configs/%s/resultado/%s.pyobj' % (code, melhor.nome), 'wb')
     pickle.dump(melhor, arq_melhor)
     arq_melhor.close()
-    print("%s\n  cw = %.3f CL/CD = %.4f atrim = %.3f Sw = %.3f ME = %.2f%% Mtow = %.4f pouso = %.2f decolagem = %.2f perf = %s arw = %.3f arh = %.3f xcg = %.4f" % (melhor.nome, melhor.cw, melhor.CL_CD, melhor.atrim, melhor.Sw, melhor.ME*100, melhor.mtow, melhor.x_pouso, melhor.x_decolagem, melhor.perfil_asa, melhor.ARw, melhor.ARh, melhor.xcg))
+    print("%s\n  cw = %.3f CL/CD = %.4f atrim = %.3f Sw = %.3f ME = %.2f%% Mtow = %.4f pouso = %.2f decolagem = %.2f perf = %s arw = %.3f arh = %.3f Sst = %.3f " % (melhor.nome, melhor.cw, melhor.CL_CD, melhor.atrim, melhor.Sw, melhor.ME*100, melhor.mtow, melhor.x_pouso, melhor.x_decolagem, melhor.perfil_asa, melhor.ARw, melhor.ARh, melhor.Sst))
     print("perfis asa: ", melhor.geometria_asa)
     print("perfis ev: ", melhor.geometria_ev)
     print("perfis eh: ", melhor.geometria_eh)
@@ -110,6 +111,9 @@ for melhor in melhores_geracao:
     print("Solo ev: ", melhor.dist_solo_ev)
     avl.criar_arquivo(melhor, False)
 
+os.mkdir('./avl/configs/%s/atendem_criterios' % code)
+avl.caminho_geometrias = './avl/configs/%s/atendem_criterios/' % code
+i = 1
 if len(atendem_criterios) > 0:
     for melhores in atendem_criterios:
         for melhor in melhores:
@@ -118,17 +122,17 @@ if len(atendem_criterios) > 0:
             arq_melhor = open('./avl/configs/%s/atendem_criterios/%s.pyobj' % (code, melhor.nome), 'wb')
             pickle.dump(melhor, arq_melhor)
             arq_melhor.close()
-            print("%s\n  cw = %.3f CL/CD = %.4f atrim = %.3f Sw = %.3f ME = %.2f%% Mtow = %.4f pouso = %.2f decolagem = %.2f perf = %s arw = %.3f arh = %.3f xcg = %.4f" % (melhor.nome, melhor.cw, melhor.CL_CD, melhor.atrim, melhor.Sw, melhor.ME*100, melhor.mtow, melhor.x_pouso, melhor.x_decolagem, melhor.perfil_asa, melhor.ARw, melhor.ARh, melhor.xcg))
-            print("perfis asa: ", melhor.geometria_asa)
-            print("perfis ev: ", melhor.geometria_ev)
-            print("perfis eh: ", melhor.geometria_eh)
-            print("Posicoes ev: ", melhor.posicoes["ev"])
-            print("Posicoes eh: ", melhor.posicoes["eh"])
-            print("Altura: ", melhor.altura)
-            print("Largura: ", melhor.lagura_asa)
-            print("Pos eh: ", melhor.pos_eh)
-            print("Envergadura: ", melhor.envergadura)
-            print("Solo ev: ", melhor.dist_solo_ev)
+            # print("%s\n  cw = %.3f CL/CD = %.4f atrim = %.3f Sw = %.3f ME = %.2f%% Mtow = %.4f pouso = %.2f decolagem = %.2f perf = %s arw = %.3f arh = %.3f xcg = %.4f" % (melhor.nome, melhor.cw, melhor.CL_CD, melhor.atrim, melhor.Sw, melhor.ME*100, melhor.mtow, melhor.x_pouso, melhor.x_decolagem, melhor.perfil_asa, melhor.ARw, melhor.ARh, melhor.xcg))
+            # print("perfis asa: ", melhor.geometria_asa)
+            # print("perfis ev: ", melhor.geometria_ev)
+            # print("perfis eh: ", melhor.geometria_eh)
+            # print("Posicoes ev: ", melhor.posicoes["ev"])
+            # print("Posicoes eh: ", melhor.posicoes["eh"])
+            # print("Altura: ", melhor.altura)
+            # print("Largura: ", melhor.lagura_asa)
+            # print("Pos eh: ", melhor.pos_eh)
+            # print("Envergadura: ", melhor.envergadura)
+            # print("Solo ev: ", melhor.dist_solo_ev)
             avl.criar_arquivo(melhor, False)
 
 size = 5.0

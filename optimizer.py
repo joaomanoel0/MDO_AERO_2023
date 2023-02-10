@@ -6,8 +6,8 @@ from classe_desempenho import desempenho
 # from random import *
 
 n_selecionados = 500 # reprodução 1
-n_filhos = 450
-n_candidatos = 500
+n_filhos = 50
+n_candidatos = 75
 
 
 c_min_w = 0.2
@@ -33,7 +33,7 @@ iw_max = 7
 ih_max = -7
 
 
-offset_max = 0.02
+offset_max = 0.05
 n_sect = 3
 # dist_nariz = 0.295 
 # soma_dims = 3.2 - dist_nariz
@@ -54,13 +54,13 @@ def gerar_inicial(total):
     contador = 0
     while len(aeronaves) < total:
         #print("ok1")
-        cr = random.uniform(c_min_w, c_max_w)
-        cint = random.uniform(c_min_w, cr)
-        ct = random.uniform(c_min_w, cint)
-        br = random.uniform((b_min_w/2)*0.75, (b_max_w/2)*0.75)
-        bt = random.uniform(0.1, b_max_w/2 - br)
         o1 = random.uniform(0, offset_max)
         o2 = random.uniform(o1,offset_max)
+        cr = random.uniform(c_min_w, c_max_w)
+        cint = random.uniform(c_min_w, cr - o1)
+        ct = random.uniform(c_min_w, cr - o2)
+        br = random.uniform((b_min_w/2)*0.75, (b_max_w/2)*0.75)
+        bt = random.uniform(0.1, b_max_w/2 - br)
         b = br + bt
         bint = random.uniform(((b - br)*0.3) + br, ((b - br)*0.7) + br)
         
@@ -118,19 +118,19 @@ def variar(aeronave, sigma):  # função para variar os paramestros de uma aeron
         crv, ctv, bv = ch, geometria_ev[1][1], geometria_ev[1][0]
         pos_cp = aeronave.posicoes['cp'][0]
 
-        cr = round(trunc_gauss(cr, sigma, ct, c_max_w), 2)
-        cint = round(trunc_gauss(cint, sigma, c_min_w, cr), 2)
-        br = round(trunc_gauss(br, sigma, b_min_w/2, b_max_w/2 - 0.5), 2)
-        bt = round(trunc_gauss(bt, sigma, 0.1, b_max_w/2 - bt), 2)
         o1 = round(trunc_gauss(o1, sigma, 0, offset_max), 2)
-        ct = round(trunc_gauss(ct, sigma, c_min_w, cr), 2)
+        o2 = round(trunc_gauss(o2, sigma, o1, offset_max))
+        cr = round(trunc_gauss(cr, sigma, c_min_w, c_max_w), 2)
+        ct = round(trunc_gauss(ct, sigma, c_min_w, cr - o2), 2)
+        cint = round(trunc_gauss(cint, sigma, c_min_w, cr - o1), 2)
+        br = round(trunc_gauss(br, sigma, (b_min_w/2)*0.75, (b_max_w/2)*0.75), 2)
+        bt = round(trunc_gauss(bt, sigma, 0.1, b_max_w/2 - bt), 2)
         b = round(bt + br, 2) 
         b = round(trunc_gauss(b, sigma, 0.1, 1.15), 2)
 
         ch = round(trunc_gauss(ch, sigma, c_min_h, c_max_h), 2)
         bh = round(trunc_gauss(bh, sigma, b_min_h/2, b_max_h/2), 2)
 
-        o2 = round(trunc_gauss(o2, sigma, o1, offset_max))
         bint = round(trunc_gauss(bint, sigma,((b - br)*0.3) + br, ((b - br)*0.7) + br), 2)
 
         lambda_v = ctv/crv

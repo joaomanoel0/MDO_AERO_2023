@@ -5,13 +5,13 @@ from operator import attrgetter
 from classe_desempenho import desempenho
 # from random import *
 
-n_candidatos = 150
-n_selecionados = 25
-n_filhos = 50
+n_selecionados = 300
+n_filhos = 300
+n_candidatos = 300
 
 
 c_min_w = 0.2
-c_max_w = 0.5
+c_max_w = 0.6
 
 b_min_h = 0.1
 c_min_h = 0.1
@@ -33,7 +33,7 @@ iw_max = 7
 ih_max = -7
 
 
-offset_max = 0.10
+offset_max = 0.02
 n_sect = 3
 # dist_nariz = 0.295 
 # soma_dims = 3.2 - dist_nariz
@@ -43,8 +43,6 @@ b_min_w = 1.5 #envergadura min
 b_max_w = 2.3 #envergadura max
 dist_solo_ev_min = 0.06
 
-# perfis_asa = ['FX 74-Cl5-140 MOD (smoothed)', 'S1223 RTL', 'CH10 (smoothed)', 'DAE-21 AIRFOIL', 'WORTMANN FX 63-137 AIRFOIL', 'e423']
-# perfis_eh = ['e168', 'e169', 'e479', 'n0012', 'naca0015']
 perfis_asa = ['Asa_1', 'Asa_2', 'Asa_3', 'Asa_4']
 perfis_eh = ['EH_1', 'EH_2', 'EH_3']
 perfis_ev = ['EV_1', 'EV_2', 'EV_3']
@@ -53,6 +51,7 @@ perfis_ev = ['EV_1', 'EV_2', 'EV_3']
 # gera aleatpriamente, entre os extremos máximos e minimos os valores dos parâmetros da aeronave
 def gerar_inicial(total):
     aeronaves = []
+    contador = 0
     while len(aeronaves) < total:
         #print("ok1")
         cr = random.uniform(c_min_w, c_max_w)
@@ -60,8 +59,8 @@ def gerar_inicial(total):
         ct = random.uniform(c_min_w, cint)
         br = random.uniform((b_min_w/2)*0.75, (b_max_w/2)*0.75)
         bt = random.uniform(0.1, b_max_w/2 - br)
-        o1 = random.uniform(0, offset_max/10)
-        o2 = random.uniform(o1,offset_max/10)
+        o1 = random.uniform(0, offset_max)
+        o2 = random.uniform(o1,offset_max)
         b = br + bt
         bint = random.uniform(((b - br)*0.3) + br, ((b - br)*0.7) + br)
         
@@ -84,9 +83,6 @@ def gerar_inicial(total):
 
         ht = random.uniform(0, ht_max)
         lt = random.uniform(cr, 1.5 - ch)
-        #lt = soma_dims - ch - b*2
-
-        #mtow = random.uniform(mtow_min, mtow_max)
 
         pos_cp = round(random.uniform(pos_cp_min, pos_cp_max)*cr, 2)
 
@@ -94,15 +90,15 @@ def gerar_inicial(total):
                     'ev': (lt, ht), 'cp': (pos_cp, 0)}
         perfil_asa = random.choice(perfis_asa)
         perfil_eh = random.choice(perfis_eh)
-        # preenche o vetor de aeronaves com aeronaves
         perfil_ev = random.choice(perfis_ev)
         try:
             aeronave = Monoplano(geometria_asa, perfil_asa, iw, geometria_eh, perfil_eh, ih, geometria_ev, perfil_ev, posicoes)
-            #print("append")
-            aeronaves.append(aeronave)
+            if verifica_cond(aeronave):
+                contador += 1
+                print(contador)
+                aeronaves.append(aeronave)
         except:
             continue
-        
     return aeronaves
 
 
@@ -161,8 +157,11 @@ def variar(aeronave, sigma):  # função para variar os paramestros de uma aeron
         posicoes = {'asa': (0, 0), 'eh': (lt, ht),
                     'ev': (lt, ht), 'cp': (pos_cp, 0)}
         try:
-            aeronave = Monoplano(geometria_asa, aeronave.perfil_asa, iw, geometria_eh, aeronave.perfil_eh, ih, geometria_ev, aeronave.perfil_ev, posicoes)
-            break
+            aeronave_1 = Monoplano(geometria_asa, aeronave.perfil_asa, iw, geometria_eh, aeronave.perfil_eh, ih, geometria_ev, aeronave.perfil_ev, posicoes)
+            if verifica_cond(aeronave_1):
+                #print("ok1")
+                aeronave = aeronave_1
+                break
         except:
             continue
     return aeronave
@@ -172,7 +171,6 @@ def gerarFilho(pai, mae, sigma, indiceMutacao):
     variar = 0
     while True:
         #print("GerarF")
-        #print(variar)
         geometria_asaPai = pai.geometria_asa.copy()
         geometria_ehPai = pai.geometria_eh.copy()
         geometria_evPai = pai.geometria_ev.copy()
@@ -181,68 +179,24 @@ def gerarFilho(pai, mae, sigma, indiceMutacao):
         geometria_evMae = mae.geometria_ev.copy()
         posicoes_Mae = mae.posicoes.copy()
 
-        #dados da aeronave pai
-        # brPai, crPai, o1xPai = geometria_asaPai[1]
-        # bintPai, cintPai, o1Pai = geometria_asaPai[2]
-        # bPai, ctPai, o2Pai = geometria_asaPai[3]
-
-        # btPai = bPai - brPai
-        # chPai, bhPai = geometria_ehPai[0][1], geometria_ehPai[1][0]
-        # crvPai, ctvPai, bvPai = chPai, geometria_evPai[1][1], geometria_evPai[1][0]
-        # pos_cpPai = pai.posicoes['cp'][0]
-
-        # #dados da aeronave mae
-        # brMae, crMae, o1xMae = geometria_asaMae[1]
-        # bintMae, cintMae, o1Mae = geometria_asaMae[2]
-        # bMae, ctMae, o2Mae = geometria_asaMae[3]
-
-        # bint, cint = bintMae, cintMae
-        # btMae = bMae - brMae
-        # chMae, bhMae = geometria_ehMae[0][1], geometria_ehMae[1][0]
-        # crvMae, ctvMae, bvMae = chMae, geometria_evMae[1][1], geometria_evMae[1][0]
-        # pos_cpMae = mae.posicoes['cp'][0]
-
-        # br, bt, cr, o1, ct, o2 = brMae, btMae, crMae, o1Mae, ctMae, o2Mae
-        # b = round(bt + br, 2)
-        # b = round(trunc_gauss(b, sigma, 0.1, 1.15), 2)
-
-        # ch, bh = chPai, bhPai
-
-        # lambda_v = ctvPai/crvPai
-
-        # crv, ctv, bv = crvMae, ctvMae, bvMae
-
-        # iw, ih = pai.iw, mae.ih
-
-        # ht = round(pai.posicoes['eh'][1], 2)
-
-        # lt = round(mae.posicoes['eh'][0], 2)
-
-        # pos_cp = pos_cpMae
-
-        # geometria_asa = [(0, cr, 0), (br, cr, 0), (bint, cint, o1), (b, ct, o2)]
-        # geometria_eh = [(0, ch, 0), (bh, ch, 0)]
-        # geometria_ev = [(0, crv, 0), (bv, ctv, crv-ctv)]
-
-        # posicoes = {'asa': (0, 0), 'eh': (lt, ht),
-        #             'ev': (lt, ht), 'cp': (pos_cp, 0)}
         try: 
             aeronave = Monoplano(geometria_asaPai, pai.perfil_asa, mae.iw, geometria_ehMae, mae.perfil_eh, pai.ih, geometria_evPai, pai.perfil_ev, posicoes_Mae)
             if indiceMutacao > random.random():
                 aeronave = variar(aeronave, sigma)
-            #print("ok")
+            #print("Retorno por reprodução")
             return aeronave
         except:
             variar += 1
             if variar >= 4:
+                #aeronave_1 = variar(pai, sigma)
+                #print("Certo")
                 return pai
             else:
                 continue
-            # return pai
 
 
 def reproducao(gerados, sigma):  # função de reprodução recebe aeronaves
-    pais = sorted(gerados, key=lambda a: a.nota_avaliacao, reverse=True)[:n_selecionados]
+    pais = sorted(gerados, key=lambda a: a.nota, reverse=True)[:n_selecionados]
     filhos = []
     for pai in pais:
         for i in range(int(len(gerados)/len(pais)) - 1):
@@ -265,7 +219,7 @@ def mediaAvaliacao(aeronaves):
     return (media/(len(aeronaves)))
 
 def sortear(pais, indice_a_ignorar = -1):
-    sigma = len(pais)/20
+    sigma = len(pais)/50
     continua = True
     while continua:
         indice_sorteado = int(random.gauss(0, sigma))
@@ -276,26 +230,35 @@ def sortear(pais, indice_a_ignorar = -1):
     return indice_sorteado
 
 def selecaoRoleta(pais):
-    ordenados = sorted(pais,  key=attrgetter('nota_avaliacao'), reverse=True)
-    indice_pai = sortear(ordenados)
-    indice_mae = sortear(ordenados, indice_pai)
+    #ordenados = sorted(pais,  key=attrgetter('nota'), reverse=True)
+    indice_pai = sortear(pais)
+    indice_mae = sortear(pais, indice_pai)
     pai = pais[indice_pai]
     mae = pais[indice_mae]
-
     return pai, mae
 
-def reproducao2(populacao, n_filhos, sigma, mutacao = 0.4):
-    candidatos = sorted(populacao, key = lambda a : a.nota_avaliacao, reverse = True)[:int(n_filhos/2)]
+def reproducao2(populacao, sigma, mutacao = 0.4):
+    #candidatos = sorted(populacao, key = lambda a : a.nota_avaliacao, reverse = True)[:int(n_filhos/2)]
+    ordenados = sorted(populacao,  key=attrgetter('nota'), reverse=True)
+    atendem_estabilidade = []
     filhos = []
-    for individuo in candidatos:
-        pai, mae = selecaoRoleta(candidatos)
-        #print("ok2.1")
-        filho1, filho2 = gerarFilho(pai, mae, sigma, mutacao), variar(individuo, sigma)
-        if verifica_cond(filho1): filhos.append(filho1)
-        if verifica_cond(filho2): filhos.append(filho2)
-        # filhos.append(gerarFilho(pai, mae, sigma, mutacao))
-        # filhos.append(variar(individuo, sigma))
-    return filhos
+    contador = 0
+    while len(filhos) < int(n_filhos/2):
+        pai, mae = selecaoRoleta(ordenados)
+        filho = gerarFilho(pai, mae, sigma, mutacao)
+        if verifica_cond(filho): 
+            filhos.append(filho)
+            if verifica_cond_est(filho): 
+                atendem_estabilidade.append(filho)
+    while len(filhos) < n_filhos:
+        filho = variar(ordenados[contador], sigma)
+        if verifica_cond(filho): 
+            filhos.append(filho)
+            print("Contaodor reprodução: ", contador)
+            if verifica_cond_est(filho): 
+                atendem_estabilidade.append(filho)
+        contador += 1
+    return filhos, atendem_estabilidade
 
 def verifica_cond(aeronave):
     retorno = True
@@ -305,4 +268,12 @@ def verifica_cond(aeronave):
         retorno = False
     if aeronave.dist_solo_ev < dist_solo_ev_min:
         retorno = False
+    return retorno
+
+def verifica_cond_est(aeronave):
+    retorno = False
+    if aeronave.ME >= 0.05 and aeronave.ME <= 0.15: 
+        if aeronave.atrim >= 3 and aeronave.atrim <= 12:
+            if aeronave.Sst >= 1:
+                retorno = True 
     return retorno

@@ -21,7 +21,7 @@ class Monoplano:
     geometria_ev = []
     posicoes = {} # Referência: centro do bordo de ataque da asa
 
-    def __init__(self, asa, perfil_asa, iw, eh, perfil_eh, ih, ev, perfil_ev, posicoes, tipo_ev = 'h', tipo_helice = '16x8'):
+    def __init__(self, asa, perfil_asa, iw, eh, perfil_eh, ih, ev, perfil_ev, posicoes, tipo_ev = 'c', tipo_helice = '14x7'):
         self.tipo_ev = tipo_ev
         self.geometria_asa = asa.copy()
         self.geometria_eh = eh.copy()
@@ -50,6 +50,7 @@ class Monoplano:
         self.CLa = self.res0['CLa']
         self.CMa = self.res0['CMa']
         self.Xnp = self.res0['Xnp']
+        self.Sst = self.res0['Sst']
 
         self.resgnd = resultados_avl(self, ('solo', 0))
         self.phi = ((16*self.hw/self.bw)**2)/(1 + ((16*self.hw/self.bw)**2))
@@ -69,6 +70,7 @@ class Monoplano:
             self.CLtrim = (self.CLa*self.atrim + self.CL0)
             self.CL_CD = self.CLtrim/self.resgnd['CD']#polar_arrasto(self.CLtrim, 1)
         self.ME = (self.Xnp - self.xcg)/self.cw
+
         
         self.CLmax = self.resgnd['CL'] + (astall - self.iw)*self.resgnd['CLa']
         aero = desempenho(g, mu, self.K, self.CLmax, self.CD0, self.hw, self.bw, self.Sw, rho, tipo_helice)
@@ -92,10 +94,10 @@ class Monoplano:
         #self.x_pouso = 1.69*(W**2)/(g*rho*self.Sw*self.CLmax*(D + mu*(W - L)))
         self.x_pouso = aero.pouso()[1]
 
-        self.avaliar()
         self.pv = 4.0 # definindo valor do peso vazio 
         self.cp = self.mtow - self.pv
         self.calcula_nota_competicao()
+        self.avaliar()
 
     def dist_ev_solo(self):
         if self.tipo_ev == "h":
@@ -358,41 +360,76 @@ class Monoplano:
         return x
 
     def avaliar(self):
-        res = 0
-        # Requesitos de estabilidade estática e dinâmica (sadraey tabela 6.3)
-        CLcruzeiro = (2*g*self.mtow)/(rho*(v_cruzeiro**2)*self.Sw)
+        res = self.nota_avaliacao
+
+        if self.ME >= 0.05 and self.ME <= 0.15:
+            res += 100*self.ME
+        else:
+            res -= 100*abs(self.ME)
+
+        if self.atrim >= 3 and self.atrim <= 12:
+            res += 100*self.atrim
+        else:
+            res -= 100*abs(self.atrim)
         
-        self.dist_fuga = math.sqrt((self.posicoes['eh'][1])**2 + (self.geometria_asa[0][1] - self.posicoes['eh'][0])**2)
+        if self.CMa * 180/pi >= -0.1 and self.CMa * 180/pi <= 0.8:
+            res += 20*abs(self.CMa * 180/pi)
+        else:
+            res -= 20*abs(self.CMa * 180/pi)
 
-        res += func_erro_neg(self.cw, self.dist_fuga, 10000)
-        res += func_erro_neg(self.CLtrim, self.CLmax, 1000)
-        res += func_erro_neg(self.CMa, 0, 100000)
-        res += func_erro_neg(0, self.CM0, 1000)
-        res += func_erro_neg(0, self.atrim, 1000)
-        res += func_erro_neg(0.05, self.ME, 100000)
-        res += func_erro_neg(self.ARh, 11, 1000)
+        if self.res0['CMq'] * 180/pi >= -40 and self.res0['CMq'] * 180/pi <= -5:
+            res += 20*abs(self.CMa * 180/pi)
+        else:
+            res -= 20*abs(self.CMa * 180/pi)
 
-        res += 20*func_erro(self.CMa * 180/pi, -0.1, -0.8)
-        res += 20*func_erro(self.res0['CMq'] * 180/pi, -5, -40)
-        res += 20*func_erro(self.res0['Cnb'] * 180/pi, 0.05, 0.4)
-        res += 20*func_erro(self.res0['Cnr'] * 180/pi, -0.1, -1)
-        res += 1000*func_erro(self.ME*100, 5, 15)
+        if self.res0['Cnb'] * 180/pi >= 0.05 and self.res0['Cnb'] * 180/pi <= 0.4:
+            res += 20*abs(self.res0['Cnb'] * 180/pi)
+        else:
+            res -= 20*abs(self.res0['Cnb'])
 
-        res += 500*func_erro(self.atrim, 3, 9)
-        res += 3*func_erro(self.VH, 0.3, 0.5)
-        res += 3*func_erro(self.VV, 0.02, 0.05)
-        res += 2*func_erro(self.CL_CD, 10, 50)
-        res += 5*func_erro(self.x_pouso, 80, 120)
-        res += 100*func_erro(self.x_decolagem, 49.5, 50)
-        res += 20*func_erro(self.CLtrim, CLcruzeiro - 0.1, CLcruzeiro + 0.1)
-        res += 5*func_erro(self.ARw, 4, 8)
-        res += 50*func_erro(self.ARh, 3, 5)
-        #res += 1200*(self.carga_paga)**2
+        if self.res0['Cnr'] * 180/pi >= -1 and self.res0['Cnr'] * 180/pi <= -0.1:
+            res += 20*abs(self.res0['Cnb'] * 180/pi)
+        else:
+            res -= 20*abs(self.res0['Cnb'] * 180/pi)
+
+        if self.Sst >= 1:
+            res += 10*self.Sst
+        else:
+            res -= 100*self.Sst
+
         self.nota = res
+        # Requesitos de estabilidade estática e dinâmica (sadraey tabela 6.3)
+        # CLcruzeiro = (2*g*self.mtow)/(rho*(v_cruzeiro**2)*self.Sw)
+        
+        # self.dist_fuga = math.sqrt((self.posicoes['eh'][1])**2 + (self.geometria_asa[0][1] - self.posicoes['eh'][0])**2)
+
+        # res += func_erro_neg(self.cw, self.dist_fuga, 10000)
+        # res += func_erro_neg(self.CLtrim, self.CLmax, 1000)
+        # res += func_erro_neg(self.CMa, 0, 100000)
+        # res += func_erro_neg(0, self.CM0, 1000)
+        # res += func_erro_neg(0, self.atrim, 1000)
+        # res += func_erro_neg(0.05, self.ME, 100000)
+        # res += func_erro_neg(self.ARh, 11, 1000)
+
+        # res += 20*func_erro(self.CMa * 180/pi, -0.1, -0.8)
+        # res += 20*func_erro(self.res0['CMq'] * 180/pi, -5, -40)
+        # res += 20*func_erro(self.res0['Cnb'] * 180/pi, 0.05, 0.4)
+        # res += 20*func_erro(self.res0['Cnr'] * 180/pi, -0.1, -1)
+        # res += 1000*func_erro(self.ME*100, 5, 15)
+
+        # res += 500*func_erro(self.atrim, 3, 9)
+        # res += 3*func_erro(self.VH, 0.3, 0.5)
+        # res += 3*func_erro(self.VV, 0.02, 0.05)
+        # res += 2*func_erro(self.CL_CD, 10, 50)
+        # res += 5*func_erro(self.x_pouso, 80, 120)
+        # res += 100*func_erro(self.x_decolagem, 49.5, 50)
+        # res += 20*func_erro(self.CLtrim, CLcruzeiro - 0.1, CLcruzeiro + 0.1)
+        # res += 5*func_erro(self.ARw, 4, 8)
+        # res += 50*func_erro(self.ARh, 3, 5)
+        #res += 1200*(self.carga_paga)**2
     
     def calcula_nota_competicao(self):
         self.nota_avaliacao = 15*(self.cp/self.pv)+self.cp
-        #self.nota_avaliacao = self.cp*12.5
 
 def func_erro(valor, bot, top):
     weight = 4/((bot-top)**2)

@@ -27,6 +27,11 @@ inicial = optimizer.gerar_inicial(600)
 media_notas.append(optimizer.mediaAvaliacao(inicial))
 
 candidatos = sorted(inicial, key = lambda a : a.nota, reverse = True)[:optimizer.n_candidatos]
+melhor = max(candidatos, key= lambda a : a.nota)
+print(melhor.perfil_asa, melhor.perfil_eh, melhor.perfil_ev, "geração 0: %.3f" % (melhor.nota), " | Nota na competição: ", melhor.nota_avaliacao)
+print("xcp = %.3f CLmax = %.4f atrim = %.3f Sw = %.3f ME = %.2f%% CP = %.2f pouso = %.2f decolagem = %.2f cma = %.2f arw = %.3f arh = %.3f mtow = %.3f Sst = %.3f" % (melhor.posicoes['cp'][0], melhor.CLmax, melhor.atrim, melhor.Sw, melhor.ME*100, melhor.cp, melhor.x_pouso, melhor.x_decolagem, melhor.CMa *180/3.1416, melhor.ARw, melhor.ARh, melhor.mtow, melhor.Sst))
+print("Nome melhor: ", melhor.nome)
+print("Média da geração: ", optimizer.mediaAvaliacao(candidatos))
 ant = 0
 n = 50
 nota_ant = -1000

@@ -23,22 +23,23 @@ os.mkdir('./avl/configs/%s/geracao-%d' % (code, 0))
 avl.caminho_geometrias = './avl/configs/%s/geracao-%d/' % (code, 0)
 
 media_notas = []
-inicial = optimizer.gerar_inicial(100)
+inicial = optimizer.gerar_inicial(300)
 media_notas.append(optimizer.mediaAvaliacao(inicial))
 
 candidatos = sorted(inicial, key = lambda a : a.nota, reverse = True)[:optimizer.n_candidatos]
 ant = 0
-n = 2
+n = 3
 nota_ant = -1000
 notas = []
 melhores_geracao = []
+atendem_criterios = []
 
 for j in range(n):
     os.mkdir('./avl/configs/%s/geracao-%d' % (code, j+1))
     avl.caminho_geometrias = './avl/configs/%s/geracao-%d/' % (code,j + 1)
-    candidatos = optimizer.reproducao2(candidatos, optimizer.n_filhos, 0.01)
-
-    melhor = max(candidatos, key= lambda a : a.nota_avaliacao)
+    candidatos, atendem_estabilidade = optimizer.reproducao2(candidatos, 0.1)
+    if len(atendem_estabilidade) > 0: atendem_criterios.append(atendem_estabilidade)
+    melhor = max(candidatos, key= lambda a : a.nota)
     print(melhor.perfil_asa, melhor.perfil_eh, melhor.perfil_ev, "geração %d: %.3f" % (j+1, melhor.nota), " | Nota na competição: ", melhor.nota_avaliacao)
     print("xcp = %.3f CLmax = %.4f atrim = %.3f Sw = %.3f ME = %.2f%% CP = %.2f pouso = %.2f decolagem = %.2f cma = %.2f arw = %.3f arh = %.3f mtow = %.3f" % (melhor.posicoes['cp'][0], melhor.CLmax, melhor.atrim, melhor.Sw, melhor.ME*100, melhor.cp, melhor.x_pouso, melhor.x_decolagem, melhor.CMa *180/3.1416, melhor.ARw, melhor.ARh, melhor.mtow))
     print("Média da geração: ", optimizer.mediaAvaliacao(candidatos))
@@ -49,12 +50,8 @@ for j in range(n):
     pickle.dump(melhor, arq_melhor)
     arq_melhor.close()
     shutil.rmtree('./avl/configs/%s/geracao-%d/' % (code, j + 1))
-    # if abs(melhor.nota_avaliacao - sum(notas)/10) < 0.5 and len(notas) == 10:
-    #     break
-    # if len(notas) == 10:
-    #     notas.pop(0)
 
-candidatos.sort(key=lambda a : a.nota_avaliacao, reverse=True)
+candidatos.sort(key=lambda a : a.nota, reverse=True)
 os.mkdir('./avl/configs/%s/resultado' % code)
 avl.caminho_geometrias = './avl/configs/%s/resultado/' % code
 i = 1
@@ -99,6 +96,26 @@ for melhor in melhores_geracao:
     print("Envergadura: ", melhor.envergadura)
     print("Solo ev: ", melhor.dist_solo_ev)
     avl.criar_arquivo(melhor, False)
+
+if len(atendem_criterios) > 0:
+    for melhor in atendem_criterios:
+        melhor.nome = '%d'%i
+        i += 1
+        arq_melhor = open('./avl/configs/%s/atendem_criterios/%s.pyobj' % (code, melhor.nome), 'wb')
+        pickle.dump(melhor, arq_melhor)
+        arq_melhor.close()
+        print("%s\n  cw = %.3f CL/CD = %.4f atrim = %.3f Sw = %.3f ME = %.2f%% Mtow = %.4f pouso = %.2f decolagem = %.2f perf = %s arw = %.3f arh = %.3f xcg = %.4f" % (melhor.nome, melhor.cw, melhor.CL_CD, melhor.atrim, melhor.Sw, melhor.ME*100, melhor.mtow, melhor.x_pouso, melhor.x_decolagem, melhor.perfil_asa, melhor.ARw, melhor.ARh, melhor.xcg))
+        print("perfis asa: ", melhor.geometria_asa)
+        print("perfis ev: ", melhor.geometria_ev)
+        print("perfis eh: ", melhor.geometria_eh)
+        print("Posicoes ev: ", melhor.posicoes["ev"])
+        print("Posicoes eh: ", melhor.posicoes["eh"])
+        print("\nAltura: ", melhor.altura)
+        print("Largura: ", melhor.lagura_asa)
+        print("Pos eh: ", melhor.pos_eh)
+        print("Envergadura: ", melhor.envergadura)
+        print("Solo ev: ", melhor.dist_solo_ev)
+        avl.criar_arquivo(melhor, False)
 
 size = 5.0
 x = np.arange(0, len(media_notas), 1)

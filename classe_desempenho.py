@@ -97,7 +97,7 @@ class desempenho:
         rho = 1 # parâmetro de densidade que auxiliará a percorrer a lista
         Carga_util = [] # lista vazia para receber os valores de Sg, W e rho
         while rho <= 3:
-            mtow = 12.0 # Mtow inicial
+            mtow = 10.0 # Mtow inicial
             if rho == 1: rho = 1.225 # Troca o valor de rho = 1 para rho = 1.225 kg/m³
             elif rho == 2: rho = 1.156 # Troca o valor de rho = 2 para rho = 1.156 kg/m³
             else: rho = 1.090 # Troca o valor de rho = 3 para rho = 1.090 kg/m³
@@ -117,12 +117,12 @@ class desempenho:
             else: break
         x1, x2, x3 = [],[],[] # Valores de distância de decolagem para diferentes pesos na densidade do ar de 0m, 600m e 1200m
         y1, y2, y3 = [],[],[] # Valores de Pesos (W) diferentes para deolagem na densidade do ar de 0m, 600m e 1200m
-        mtowF, mtowS, mtowI = 1,1,1 # Força as variáveis de mtow(rho) existirem no MDO
+        mtowF, mtowS, mtowI = 10,10,10 # Força as variáveis de mtow(rho) existirem no MDO
         for i in Carga_util:
             if i[2] == 1.225:
                 x1.append(i[0]) # Valores de dist. de decolagem com rho = 1.225 kg/m³
                 y1.append(i[1]) # Valores de Peso com rho = 1.225 kg/m³
-                if i[0] <= 58: # Distância (m) que se espera que a aeroanave atinja a velocidade de decolagem em rho = 1.225 kg/m³ 
+                if i[0] <= 50: # Distância (m) que se espera que a aeroanave atinja a velocidade de decolagem em rho = 1.225 kg/m³ 
                     mtowF = i[1]/self.g # Se o menor elemento de i[0] > "condição acima", então mtowF = 1
             elif i[2] == 1.156:
                 x2.append(i[0]) # Valores de dist. de decolagem com rho = 1.156 kg/m³

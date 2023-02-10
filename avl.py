@@ -40,7 +40,7 @@ def criar_arquivo(aeronave, efeito_solo):
         arq.write("EH\n")
         arq.write("4 1.0 6 1.0\n") # Discretização
         arq.write("TRANSLATE\n")
-        arq.write("%.2f %.2f %.2f\n" % (aeronave.posicoes["eh"][0], 0, aeronave.posicoes["eh"][1]+(aeronave.bv/2)))
+        arq.write("%.2f %.2f %.2f\n" % (aeronave.posicoes["eh"][0], 0, aeronave.posicoes["eh"][1]+(aeronave.bv/2) -0.02))
         arq.write("YDUPLICATE\n0.0\n")
         arq.write("ANGLE\n%.0f\n" % aeronave.ih)
         arq.write("COMPONENT\n2\n")
@@ -53,7 +53,7 @@ def criar_arquivo(aeronave, efeito_solo):
         arq.write("EV\n")
         arq.write("4 1.0 6 1.0\n") # Discretização
         arq.write("TRANSLATE\n")
-        arq.write("%.2f %.2f %.2f\n" % (aeronave.posicoes["ev"][0], 0, aeronave.posicoes["ev"][1]))
+        arq.write("%.2f %.2f %.2f\n" % (aeronave.posicoes["ev"][0], 0, aeronave.posicoes["ev"][1] - 0.02))
         arq.write("COMPONENT\n2\n")
         for sect in aeronave.geometria_ev:
             arq.write("SECTION\n")
@@ -191,5 +191,8 @@ def resultados_avl(aeronave, comando): # CM0, CL0, CLa, CMa, Xnp
 
     match = re.search(r'(CDtot =...........)', output)
     results['CD'] = float(output[match.start() + 7:match.start() + 17])
+
+    match = re.search(r'(Clb Cnr / Clr Cnb  =...........)', output)
+    results['Sst'] = float(output[match.start() + 23:match.start() + 32])
 
     return results

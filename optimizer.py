@@ -118,13 +118,13 @@ def variar(aeronave, sigma):  # função para variar os paramestros de uma aeron
         crv, ctv, bv = ch, geometria_ev[1][1], geometria_ev[1][0]
         pos_cp = aeronave.posicoes['cp'][0]
 
+        cr = round(trunc_gauss(cr, sigma, ct, c_max_w), 2)
         cint = round(trunc_gauss(cint, sigma, c_min_w, cr), 2)
         br = round(trunc_gauss(br, sigma, b_min_w/2, b_max_w/2 - 0.5), 2)
         bt = round(trunc_gauss(bt, sigma, 0.1, b_max_w/2 - bt), 2)
-        cr = round(trunc_gauss(cr, sigma, ct, c_max_w), 2)
         o1 = round(trunc_gauss(o1, sigma, 0, offset_max), 2)
         ct = round(trunc_gauss(ct, sigma, c_min_w, cr), 2)
-        b = round(bt + br, 2)
+        b = round(bt + br, 2) 
         b = round(trunc_gauss(b, sigma, 0.1, 1.15), 2)
 
         ch = round(trunc_gauss(ch, sigma, c_min_h, c_max_h), 2)

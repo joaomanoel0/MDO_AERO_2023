@@ -161,8 +161,8 @@ def resultados_avl(aeronave, comando): # CM0, CL0, CLa, CMa, Xnp
         return None
     else:
         match = re.search(r'Alpha =..........', output)
-        if match == None:
-            print(output)
+        # if match == None:
+        #     print(output)
         results['Alpha'] = float(output[match.start() + 7:match.start() + 17])
 
     match = re.search(r'(Cmtot =..........)', output)
@@ -193,6 +193,6 @@ def resultados_avl(aeronave, comando): # CM0, CL0, CLa, CMa, Xnp
     results['CD'] = float(output[match.start() + 7:match.start() + 17])
 
     match = re.search(r'(Clb Cnr / Clr Cnb  =...........)', output)
-    results['Sst'] = float(output[match.start() + 23:match.start() + 32])
-
+    results['Sst'] = float(output[match.start() + 22:match.start() + 32])
+    
     return results

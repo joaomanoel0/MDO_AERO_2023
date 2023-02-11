@@ -42,7 +42,7 @@ class Monoplano:
         self.perfil_asa = perfil_asa
         self.perfil_eh = perfil_eh
         self.perfil_ev = perfil_ev
-        self.nome = random.choice(nomes) + '-' + random.choice(nomes) + '-' + str(random.randint(1000, 9999))
+        self.nome = random.choice(nomes) + '-' + random.choice(nomes) + '-' + str(random.randint(1000000000, 9999999999))
         self.hw = 0.2416 #altura da asa
         self.res0 = resultados_avl(self, ('alpha', 0))
         self.CM0 = self.res0['CM']

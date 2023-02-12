@@ -23,7 +23,7 @@ os.mkdir('./avl/configs/%s/geracao-%d' % (code, 0))
 avl.caminho_geometrias = './avl/configs/%s/geracao-%d/' % (code, 0)
 
 media_notas = []
-inicial = optimizer.gerar_inicial(600)
+inicial = optimizer.gerar_inicial(100)
 media_notas.append(optimizer.mediaAvaliacao(inicial))
 
 candidatos = sorted(inicial, key = lambda a : a.nota, reverse = True)[:optimizer.n_candidatos]
@@ -33,7 +33,7 @@ print("xcp = %.3f CLmax = %.4f atrim = %.3f Sw = %.3f ME = %.2f%% CP = %.2f pous
 print("Nome melhor: ", melhor.nome)
 print("Média da geração: ", optimizer.mediaAvaliacao(candidatos))
 ant = 0
-n = 50
+n = 2
 nota_ant = -1000
 notas = []
 melhores_geracao = []

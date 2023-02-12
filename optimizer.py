@@ -6,8 +6,8 @@ from classe_desempenho import desempenho
 # from random import *
 
 n_selecionados = 500 # reprodução 1
-n_filhos = 500
-n_candidatos = 550
+n_filhos = 50
+n_candidatos = 75
 
 c_min_w = 0.2
 c_max_w = 0.6
@@ -22,6 +22,7 @@ b_min_v = 0.1
 c_min_v = 0.1
 b_max_v = 0.5
 c_max_v = 0.4
+
 lambda_min_v = 0.4
 lambda_max_v = 0.95
 
@@ -32,7 +33,7 @@ iw_max = 7
 ih_max = -7
 
 
-offset_max = 0.05
+offset_max = 0.15
 n_sect = 3
 # dist_nariz = 0.295 
 # soma_dims = 3.2 - dist_nariz
@@ -40,7 +41,7 @@ n_sect = 3
 altura_max = 0.6
 b_min_w = 1.5 #envergadura min
 b_max_w = 2.3 #envergadura max
-dist_solo_ev_min = 0.06
+dist_solo_ev_min = 0.15
 
 perfis_asa = ['Asa_1', 'Asa_2', 'Asa_3', 'Asa_4']
 perfis_eh = ['EH_1', 'EH_2', 'EH_3']
@@ -53,16 +54,16 @@ def gerar_inicial(total):
     while len(aeronaves) < total:
         #print("ok1")
         o1 = random.uniform(0, offset_max)
-        o2 = random.uniform(o1,offset_max)
+        #o2 = random.uniform(o1,offset_max)
         cr = random.uniform(c_min_w, c_max_w)
-        cint = random.uniform(c_min_w, cr - o1)
-        ct = random.uniform(c_min_w, cr - o2)
-        br = random.uniform((b_min_w/2)*0.75, (b_max_w/2)*0.75)
+        #cint = random.uniform(c_min_w, cr - o1)
+        ct = random.uniform(c_min_w, cr - o1)
+        br = random.uniform((b_min_w/2), (b_max_w/2))
         bt = random.uniform(0.1, b_max_w/2 - br)
         b = br + bt
-        bint = random.uniform(((b - br)*0.3) + br, ((b - br)*0.7) + br)
+        #bint = random.uniform(((b - br)*0.3) + br, ((b - br)*0.7) + br)
         
-        geometria_asa = [(0, cr, 0), (br, cr, 0), (bint, cint, o1), (b, ct, o2)]
+        geometria_asa = [(0, cr, 0), (br, cr, 0), (b, ct, o1)] #(bint, cint, o1),
 
         bh = random.uniform(b_min_h/2, b_max_h/2)
         ch = random.uniform(c_min_h, c_max_h)
@@ -109,8 +110,7 @@ def variar(aeronave, sigma):  # função para variar os paramestros de uma aeron
         geometria_ev = aeronave.geometria_ev.copy()
 
         br, cr, o1x = geometria_asa[1]
-        bint, cint, o1y = geometria_asa[2]
-        b, ct, o2y = geometria_asa[3]
+        b, ct, o1y = geometria_asa[2]
         bt = b - br
 
         ch, bh = geometria_eh[0][1], geometria_eh[1][0]
@@ -118,11 +118,11 @@ def variar(aeronave, sigma):  # função para variar os paramestros de uma aeron
         pos_cp = aeronave.posicoes['cp'][0]
 
         o1 = round(trunc_gauss(o1y, sigma, 0, offset_max), 3)
-        o2 = round(trunc_gauss(o2y, sigma, o1, offset_max), 3)
+        #o2 = round(trunc_gauss(o2y, sigma, o1, offset_max), 3)
         cr = round(trunc_gauss(cr, sigma, c_min_w, c_max_w), 3)
-        ct = round(trunc_gauss(ct, sigma, c_min_w, cr - o2), 3)
-        cint = round(trunc_gauss(cint, sigma, c_min_w, cr - o1), 3)
-        br = round(trunc_gauss(br, sigma, (b_min_w/2)*0.75, (b_max_w/2)*0.75), 3)
+        ct = round(trunc_gauss(ct, sigma, c_min_w, cr - o1), 3)
+        #cint = round(trunc_gauss(cint, sigma, c_min_w, cr - o1), 3)
+        br = round(trunc_gauss(br, sigma, (b_min_w/2), (b_max_w/2)), 3)
         bt = round(trunc_gauss(bt, sigma, 0.1, b_max_w/2 - bt), 3)
         b = round(bt + br, 3) 
         b = round(trunc_gauss(b, sigma, 0.1, 1.15), 3)
@@ -130,7 +130,7 @@ def variar(aeronave, sigma):  # função para variar os paramestros de uma aeron
         ch = round(trunc_gauss(ch, sigma, c_min_h, c_max_h), 3)
         bh = round(trunc_gauss(bh, sigma, b_min_h/2, b_max_h/2), 3)
 
-        bint = round(trunc_gauss(bint, sigma,((b - br)*0.3) + br, ((b - br)*0.7) + br), 3)
+        #bint = round(trunc_gauss(bint, sigma,((b - br)*0.3) + br, ((b - br)*0.7) + br), 3)
 
         lambda_v = ctv/crv
         lambda_v = trunc_gauss(lambda_v, sigma, lambda_min_v, lambda_max_v)
@@ -149,7 +149,7 @@ def variar(aeronave, sigma):  # função para variar os paramestros de uma aeron
 
         pos_cp = round(trunc_gauss(pos_cp, sigma, pos_cp_min*cr, pos_cp_max*cr), 3)
 
-        geometria_asa = [(0, cr, 0), (br, cr, 0), (bint, cint, o1), (b, ct, o2)]
+        geometria_asa = [(0, cr, 0), (br, cr, 0), (b, ct, o1)] #(bint, cint, o1),
         geometria_eh = [(0, ch, 0), (bh, ch, 0)]
         geometria_ev = [(0, crv, 0), (bv, ctv, crv-ctv)]
 

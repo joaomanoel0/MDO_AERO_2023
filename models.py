@@ -31,7 +31,7 @@ class Monoplano:
         self.lagura_asa = self.geometria_asa[0][1] # do zero para pontos mais positivos
         self.pos_eh = [self.posicoes["eh"][0]+self.geometria_eh[0][1], self.posicoes["eh"][0], self.geometria_eh[0][1]] #ponto maximo x, ponto minimo x, comprimento eh (em relacao ao x)
         #print(self.pos_eh)
-        self.envergadura = self.geometria_asa[3][0]*2
+        self.envergadura = self.geometria_asa[2][0]*2
         self.dist_solo_ev = self.dist_ev_solo()
         self.atualizar_geometria()
         self.xcg = 0.3*self.cw
@@ -43,7 +43,7 @@ class Monoplano:
         self.perfil_eh = perfil_eh
         self.perfil_ev = perfil_ev
         self.nome = random.choice(nomes) + '-' + random.choice(nomes) + '-' + str(random.randint(1000000000, 9999999999))
-        self.hw = 0.2416 #altura da asa
+        self.hw = 0.2780 #altura da asa
         self.res0 = resultados_avl(self, ('alpha', 0))
         self.CM0 = self.res0['CM']
         self.CL0 = self.res0['CL']

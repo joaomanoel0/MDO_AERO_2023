@@ -13,14 +13,14 @@ def criar_arquivo(aeronave, efeito_solo):
         arq.write('0.0\n')          # Mach
         arq.write('0 1 0\n') # IYsym   IZsym   Zsym
         arq.write('%.2f %.2f %.2f\n' % (aeronave.Sw, aeronave.cw, aeronave.bw)) # Sref    Cref    Bref
-        arq.write('%.3f 0.0 %.3f\n' % (aeronave.xcg, aeronave.hw - 0.08)) # Xref    Yref    Zref (Variei o Zcg -Paulo Robson-)
+        arq.write('%.3f 0.0 %.3f\n' % (aeronave.xcg, aeronave.hw - 0.05)) # Xref    Yref    Zref (Variei o Zcg -Paulo Robson-)
     else:
         arq = open(caminho_geometrias + aeronave.nome + '.avl', 'w')
         arq.write(aeronave.nome + '\n')
         arq.write('0.0\n')          # Mach
         arq.write('0 0 0.0\n') # IYsym   IZsym   Zsym
         arq.write('%.2f %.2f %.2f\n' % (aeronave.Sw, aeronave.cw, aeronave.bw)) # Sref    Cref    Bref
-        arq.write('%.3f 0.0 %.3f\n' % (aeronave.xcg, aeronave.hw - 0.08)) # Xref    Yref    Zref (Variei o Zcg -Paulo Robson-)
+        arq.write('%.3f 0.0 %.3f\n' % (aeronave.xcg, aeronave.hw - 0.05)) # Xref    Yref    Zref (Variei o Zcg -Paulo Robson-)
 
     arq.write("\nSURFACE\n")
     arq.write("Asa\n")

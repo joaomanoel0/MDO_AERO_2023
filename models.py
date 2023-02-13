@@ -21,7 +21,7 @@ class Monoplano:
     geometria_ev = []
     posicoes = {} # Referência: centro do bordo de ataque da asa
 
-    def __init__(self, asa, perfil_asa, iw, eh, perfil_eh, ih, ev, perfil_ev, posicoes, tipo_ev = 'c', tipo_helice = '14x7'):
+    def __init__(self, asa, perfil_asa, iw, eh, perfil_eh, ih, ev, perfil_ev, posicoes, tipo_ev = 'c', tipo_helice = '16x8'):
         self.tipo_ev = tipo_ev
         self.geometria_asa = asa.copy()
         self.geometria_eh = eh.copy()
@@ -38,12 +38,14 @@ class Monoplano:
         #print("Centro de gravidade: ", self.xcg)
         self.iw = iw
         self.ih = ih
+        self.helice(tipo_helice)
+        self.zcg = (self.comp_helice/2) + 0.05 
         #self.atualizar_constantes()
         self.perfil_asa = perfil_asa
         self.perfil_eh = perfil_eh
         self.perfil_ev = perfil_ev
         self.nome = random.choice(nomes) + '-' + random.choice(nomes) + '-' + str(random.randint(1000000000, 9999999999))
-        self.hw = 0.2780 #altura da asa
+        self.hw = self.zcg + 0.05  #altura da asa
         self.res0 = resultados_avl(self, ('alpha', 0))
         self.CM0 = self.res0['CM']
         self.CL0 = self.res0['CL']
@@ -98,6 +100,11 @@ class Monoplano:
         self.cp = self.mtow - self.pv
         self.calcula_nota_competicao()
         self.avaliar()
+    
+    def helice(self, tipo_helice):
+        if tipo_helice == '14x7': self.comp_helice = 0.3556
+        elif tipo_helice == '15x7' or tipo_helice == '15x10': self.comp_helice = 0.381
+        elif tipo_helice == '16x8': self.comp_helice = 0.4064
 
     def dist_ev_solo(self):
         if self.tipo_ev == "h":
@@ -309,6 +316,8 @@ class Monoplano:
         res += 20*func_erro(self.res0['Cnb'] * 180/pi, 0.05, 0.4)
         res += 20*func_erro(self.res0['Cnr'] * 180/pi, -1, -0.1)
         res += func_erro_neg(1, self.Sst, 1000)
+        res += 5*func_erro(self.VH, 0.35, 0.5)
+        res += 5*func_erro(self.VV, 0.04, 0.06)
         self.nota = res
         # Requesitos de estabilidade estática e dinâmica (sadraey tabela 6.3)
         # CLcruzeiro = (2*g*self.mtow)/(rho*(v_cruzeiro**2)*self.Sw)

@@ -24,7 +24,7 @@ os.mkdir('./avl/configs/%s/geracao-%d' % (code, 0))
 avl.caminho_geometrias = './avl/configs/%s/geracao-%d/' % (code, 0)
 
 media_notas = []
-inicial = optimizer.gerar_inicial(200)
+inicial = optimizer.gerar_inicial(100)
 media_notas.append(optimizer.mediaAvaliacao(inicial))
 
 candidatos = sorted(inicial, key = lambda a : a.nota, reverse = True)[:optimizer.n_candidatos]
@@ -34,13 +34,14 @@ print("xcp = %.3f CLmax = %.4f atrim = %.3f Sw = %.3f ME = %.2f%% CP = %.2f pous
 print("Nome melhor: ", melhor.nome)
 print("Média da geração: ", optimizer.mediaAvaliacao(candidatos))
 ant = 0
-n = 5 # Número de gerações
+n = 3 # Número de gerações
 nota_ant = -1000
 notas = []
 melhores_geracao = []
 name,cauda_ev,cauda_eh = [],[],[] #Modf. em 12/02
 gen,med,Clma,mtow = [],[],[],[] # geração, média_nota, Clmáx, Mtow  #Modf. em 12/02
 sg,land,envg,tipo = [],[],[],[] # dist. de decolagem, dist. de pouso, envergadura, tipo_ev  #Modf. em 12/02
+arw, arh, arv = [],[],[]
 
 '''
 gerações = {
@@ -139,6 +140,9 @@ gerações = { #Modf. em 12/02
     'Tipo_ev':[],
     'Volume EV':[],
     'Volume EH':[],
+    'ARh':[],
+    'ARv':[],
+    'ARw':[],
 }
 for melhor in melhores_geracao:
     print("\n")
@@ -146,6 +150,7 @@ for melhor in melhores_geracao:
     name.append(melhor.nome), cauda_eh.append(melhor.VH), cauda_ev.append(melhor.VV) #Modf. em 13/02
     gen.append(i), Clma.append(melhor.CLmax), mtow.append(melhor.mtow) #Modf. em 12/02
     sg.append(melhor.x_decolagem), land.append(melhor.x_pouso), envg.append(melhor.envergadura) #Modf. em 12/02
+    arw.append(melhor.ARw), arv.append(melhor.ARv), arh.append(melhor.ARh)
     tipo.append(melhor.tipo_ev) #Modf. em 12/02
     i += 1
     arq_melhor = open('./avl/configs/%s/resultado/%s.pyobj' % (code, melhor.nome), 'wb')
@@ -175,12 +180,15 @@ gerações['Envergadura'] = envg
 gerações['Tipo_ev'] = tipo
 gerações['Volume EV'] = cauda_ev
 gerações['Volume EH'] = cauda_eh
+gerações['ARw'] = arw
+gerações['ARv'] = arv
+gerações['ARh'] = arh
 
 print(gerações)
 gerações_df = pd.DataFrame(data=gerações) #Modf. em 12/02
 print() # Salta uma linha
 print(gerações_df) #Modf. em 12/02
-gerações_df.to_excel(r'C:\Users\italo\OneDrive\Desktop\Códigos Python, MATLAB, Arduino e VHDL\Códigos Python\MDO 2023\Base de dados\Dados do terminal\Geração_'+code+'.xlsx', index=False)
+gerações_df.to_excel(r'C:\Users\Jmano\OneDrive - Universidade Federal do Ceará\UFC\Outros\Projetos\AEROMEC\MDO\MDO-Aero-main_rubem\MDO-Aero-main\Dados\Arq_'+code+'.xlsx', index=False)
 
 size = 5.0
 x = np.arange(0, len(media_notas), 1)

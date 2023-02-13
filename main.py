@@ -24,7 +24,7 @@ os.mkdir('./avl/configs/%s/geracao-%d' % (code, 0))
 avl.caminho_geometrias = './avl/configs/%s/geracao-%d/' % (code, 0)
 
 media_notas = []
-inicial = optimizer.gerar_inicial(100)
+inicial = optimizer.gerar_inicial(1500)
 media_notas.append(optimizer.mediaAvaliacao(inicial))
 
 candidatos = sorted(inicial, key = lambda a : a.nota, reverse = True)[:optimizer.n_candidatos]
@@ -34,7 +34,7 @@ print("xcp = %.3f CLmax = %.4f atrim = %.3f Sw = %.3f ME = %.2f%% CP = %.2f pous
 print("Nome melhor: ", melhor.nome)
 print("Média da geração: ", optimizer.mediaAvaliacao(candidatos))
 ant = 0
-n = 3 # Número de gerações
+n = 50 # Número de gerações
 nota_ant = -1000
 notas = []
 melhores_geracao = []
@@ -184,7 +184,7 @@ gerações['ARw'] = arw
 gerações['ARv'] = arv
 gerações['ARh'] = arh
 
-print(gerações)
+#print(gerações)
 gerações_df = pd.DataFrame(data=gerações) #Modf. em 12/02
 print() # Salta uma linha
 print(gerações_df) #Modf. em 12/02

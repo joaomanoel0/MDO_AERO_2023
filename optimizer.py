@@ -6,8 +6,8 @@ from classe_desempenho import desempenho
 # from random import *
 
 n_selecionados = 500 # reprodução 1
-n_filhos = 20
-n_candidatos = 20
+n_filhos = 1300
+n_candidatos = 1400
 
 c_min_w = 0.2
 c_max_w = 0.6

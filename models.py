@@ -39,13 +39,13 @@ class Monoplano:
         self.iw = iw
         self.ih = ih
         self.helice(tipo_helice)
-        self.zcg = (self.comp_helice/2) + 0.05 
+        self.zcg = (self.comp_helice/2) + 0.04 
         #self.atualizar_constantes()
         self.perfil_asa = perfil_asa
         self.perfil_eh = perfil_eh
         self.perfil_ev = perfil_ev
         self.nome = random.choice(nomes) + '-' + random.choice(nomes) + '-' + str(random.randint(1000000000, 9999999999))
-        self.hw = self.zcg + 0.05  #altura da asa
+        self.hw = self.zcg + 0.04  #altura da asa
         self.res0 = resultados_avl(self, ('alpha', 0))
         self.CM0 = self.res0['CM']
         self.CL0 = self.res0['CL']

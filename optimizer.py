@@ -6,8 +6,8 @@ from classe_desempenho import desempenho
 # from random import *
 
 n_selecionados = 500 # reprodução 1
-n_filhos = 500
-n_candidatos = 550
+n_filhos = 20
+n_candidatos = 20
 
 c_min_w = 0.2
 c_max_w = 0.6
@@ -58,7 +58,7 @@ def gerar_inicial(total):
         cr = random.uniform(c_min_w, c_max_w)
         #cint = random.uniform(c_min_w, cr - o1)
         ct = random.uniform(c_min_w, cr - o1)
-        br = random.uniform((b_min_w/2), (b_max_w/2))
+        br = random.uniform((b_min_w/2), (b_max_w/2) - 0.1)
         bt = random.uniform(0.1, b_max_w/2 - br)
         b = br + bt
         #bint = random.uniform(((b - br)*0.3) + br, ((b - br)*0.7) + br)
@@ -122,7 +122,7 @@ def variar(aeronave, sigma):  # função para variar os paramestros de uma aeron
         cr = round(trunc_gauss(cr, sigma, c_min_w, c_max_w), 3)
         ct = round(trunc_gauss(ct, sigma, c_min_w, cr - o1), 3)
         #cint = round(trunc_gauss(cint, sigma, c_min_w, cr - o1), 3)
-        br = round(trunc_gauss(br, sigma, (b_min_w/2), (b_max_w/2)), 3)
+        br = round(trunc_gauss(br, sigma, (b_min_w/2), (b_max_w/2) - 0.1), 3)
         bt = round(trunc_gauss(bt, sigma, 0.1, b_max_w/2 - bt), 3)
         b = round(bt + br, 3) 
         b = round(trunc_gauss(b, sigma, 0.1, 1.15), 3)

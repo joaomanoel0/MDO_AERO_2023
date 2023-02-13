@@ -39,7 +39,7 @@ class Monoplano:
         self.iw = iw
         self.ih = ih
         self.helice(tipo_helice)
-        self.zcg = (self.comp_helice/2) + 0.04 
+        self.zcg = (self.comp_helice/2) + 0.05 
         #self.atualizar_constantes()
         self.perfil_asa = perfil_asa
         self.perfil_eh = perfil_eh

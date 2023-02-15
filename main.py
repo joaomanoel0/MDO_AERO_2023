@@ -24,7 +24,7 @@ os.mkdir('./avl/configs/%s/geracao-%d' % (code, 0))
 avl.caminho_geometrias = './avl/configs/%s/geracao-%d/' % (code, 0)
 
 media_notas = []
-inicial = optimizer.gerar_inicial(1500)
+inicial = optimizer.gerar_inicial(500)
 media_notas.append(optimizer.mediaAvaliacao(inicial))
 
 candidatos = sorted(inicial, key = lambda a : a.nota, reverse = True)[:optimizer.n_candidatos]
@@ -34,50 +34,14 @@ print("xcp = %.3f CLmax = %.4f atrim = %.3f Sw = %.3f ME = %.2f%% CP = %.2f pous
 print("Nome melhor: ", melhor.nome)
 print("Média da geração: ", optimizer.mediaAvaliacao(candidatos))
 ant = 0
-n = 50 # Número de gerações
+n = 25 # Número de gerações
 nota_ant = -1000
 notas = []
 melhores_geracao = []
 name,cauda_ev,cauda_eh = [],[],[] #Modf. em 12/02
 gen,med,Clma,mtow = [],[],[],[] # geração, média_nota, Clmáx, Mtow  #Modf. em 12/02
 sg,land,envg,tipo = [],[],[],[] # dist. de decolagem, dist. de pouso, envergadura, tipo_ev  #Modf. em 12/02
-arw, arh, arv = [],[],[]
-
-'''
-gerações = {
-    'Geração':[],
-    'Média_pontuação':[],
-    'Clmax':[],
-    'MTOW':[],
-    'Decolagem':[],
-    'Pouso':[],
-    'Envergadura':[],
-    'Tipo_ev':[],
-}
-
-for i in range(5):
-    gen.append(i+1)
-    med.append(rd.uniform(35,60))
-    Clma.append(rd.uniform(1.6,2.3))
-    mtow.append(rd.uniform(11,14))
-    sg.append(rd.uniform(49,50))
-    land.append(rd.uniform(65,100))
-    envg.append(rd.uniform(2,2.3))
-    tipo.append('h')
-
-gerações['Geração'] = gen
-gerações['Média_pontuação'] = med
-gerações['Clmax'] = Clma
-gerações['MTOW'] = mtow
-gerações['Decolagem'] = sg
-gerações['Pouso'] = land
-gerações['Envergadura'] = envg
-gerações['Tipo_ev'] = tipo
-
-gerações_df = pd.DataFrame(gerações)
-
-print(gerações_df)
-'''
+arw, arh, arv, margem = [],[],[],[]
 
 for j in range(n):
     os.mkdir('./avl/configs/%s/geracao-%d' % (code, j+1))
@@ -127,7 +91,7 @@ for melhor in candidatos[:20]:
 melhores_geracao.sort(key=lambda a : a.nota, reverse=True)
 os.mkdir('./avl/configs/%s/melhores_geracao' % code)
 avl.caminho_geometrias = './avl/configs/%s/melhores_geracao/' % code
-i = 1
+i = 1 #Contador do Nº de gerações
 gerações = { #Modf. em 12/02
     'Nome':[],
     'Geração':[],
@@ -138,6 +102,7 @@ gerações = { #Modf. em 12/02
     'Pouso':[],
     'Envergadura':[],
     'Tipo_ev':[],
+    'ME':[],
     'Volume EV':[],
     'Volume EH':[],
     'ARh':[],
@@ -146,10 +111,10 @@ gerações = { #Modf. em 12/02
 }
 for melhor in melhores_geracao:
     print("\n")
-    melhor.nome = '%d'%i
     name.append(melhor.nome), cauda_eh.append(melhor.VH), cauda_ev.append(melhor.VV) #Modf. em 13/02
     gen.append(i), Clma.append(melhor.CLmax), mtow.append(melhor.mtow) #Modf. em 12/02
     sg.append(melhor.x_decolagem), land.append(melhor.x_pouso), envg.append(melhor.envergadura) #Modf. em 12/02
+    margem.append(melhor.ME) #Modf. em 14/02
     arw.append(melhor.ARw), arv.append(melhor.ARv), arh.append(melhor.ARh)
     tipo.append(melhor.tipo_ev) #Modf. em 12/02
     i += 1
@@ -178,6 +143,7 @@ gerações['Decolagem'] = sg
 gerações['Pouso'] = land
 gerações['Envergadura'] = envg
 gerações['Tipo_ev'] = tipo
+gerações['ME'] = margem
 gerações['Volume EV'] = cauda_ev
 gerações['Volume EH'] = cauda_eh
 gerações['ARw'] = arw
@@ -188,7 +154,7 @@ gerações['ARh'] = arh
 gerações_df = pd.DataFrame(data=gerações) #Modf. em 12/02
 print() # Salta uma linha
 print(gerações_df) #Modf. em 12/02
-gerações_df.to_excel(r'C:\Users\Jmano\OneDrive - Universidade Federal do Ceará\UFC\Outros\Projetos\AEROMEC\MDO\MDO-Aero-main_rubem\MDO-Aero-main\Dados\Arq_'+code+'.xlsx', index=False)
+gerações_df.to_excel(r'C:\Users\italo\OneDrive\Desktop\Códigos Python, MATLAB, Arduino e VHDL\Códigos Python\MDO 2023\Base de dados\Dados do terminal'+code+'.xlsx', index=False)
 
 size = 5.0
 x = np.arange(0, len(media_notas), 1)
